@@ -10,7 +10,8 @@ Workflow for driving Claude Code from a script or from another agent. Everything
 ## Core call
 
 ```bash
-claude -p "<task>" --allowedTools "Read,Glob,Grep" --output-format json 2>err.log > out.json
+claude -p "<task>" --allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode acceptEdits \
+  --output-format json 2>err.log > out.json
 ```
 
 - stdout carries exactly one JSON object — keep stderr redirected away from it.
@@ -38,8 +39,8 @@ claude -p "Follow-up: ..." --resume "$sid" --output-format json | jq -r .result
 
 ## Permissions
 
-- Read-only research: `--allowedTools "Read,Glob,Grep"`.
-- Letting it edit: add `Write,Edit` and `--permission-mode acceptEdits`.
+- **Default: let it write.** `--allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode acceptEdits` — an agent that can create and edit files is far more useful. A blocked Write in `-p` mode fails silently, leaving the agent to describe work instead of doing it.
+- Restrict to read-only (`--allowedTools "Read,Glob,Grep"`) only in the rare cases that demand it: untrusted prompts/inputs, pure analysis of a repo that must stay pristine, audits.
 - Scope Bash by prefix pattern: `--allowedTools "Bash(git diff *),Bash(ls *)"`.
 - Tools outside the allowlist are silently denied in `-p` mode — check `.permission_denials` when the agent reports it could not do something.
 - Reserve `--dangerously-skip-permissions` for disposable sandboxes.
