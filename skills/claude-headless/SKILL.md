@@ -37,6 +37,26 @@ claude -p "Follow-up: ..." --resume "$sid" --output-format json | jq -r .result
 
 `--continue` resumes the most recent session in the cwd when you did not capture the id.
 
+## Monitoring a background run
+
+For long tasks, launch in the background with the event stream going to a file, then poll the file — each line is a JSONL event:
+
+```bash
+claude -p "<long task>" --allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode auto \
+  --output-format stream-json --verbose > stream.jsonl 2>/dev/null &
+```
+
+- **What is it doing right now** — the most recent `tool_use` events:
+  ```bash
+  jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use")
+         | "\(.name) \(.input.file_path // .input.command // .input.pattern // "")"' stream.jsonl | tail -3
+  ```
+- **Is it stuck** — check the file's mtime: if `stream.jsonl` stops growing for minutes, the agent is stalled, and its last `tool_use` shows exactly where.
+- **Is it done** — the final line is a `result` event with the same fields as `--output-format json` (`.result`, `.session_id`, `.is_error`).
+- **Follow up** — after completion, interrogate or steer the same agent with `--resume <session_id>`.
+
+Verify deliverables yourself (the file exists, tests pass) rather than trusting the final message alone.
+
 ## Permissions
 
 - **Default: `--permission-mode auto` with write access.** `--allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode auto` — an agent that can create and edit files is far more useful, and `auto` removes routine prompts while a background classifier still blocks genuinely dangerous actions (`curl | bash`, force-push, production deploys, `rm -rf /`). Requires Plan/Team/Enterprise and a recent model (Sonnet 4.6+/Opus 4.6+/Fable 5). A blocked Write in `-p` mode fails silently, leaving the agent to describe work instead of doing it.

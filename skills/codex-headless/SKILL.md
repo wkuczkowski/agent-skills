@@ -49,6 +49,25 @@ codex exec resume <SESSION_ID> "follow-up"        # specific session
 
 Resumed sessions keep full context. Get the session id from the `--json` stream (`thread.started` → `thread_id`).
 
+## Monitoring a background run
+
+For long tasks, launch in the background with `--json` streaming to a file, then poll the file:
+
+```bash
+codex exec --json -m gpt-5.6-sol --sandbox workspace-write "<long task>" > events.jsonl 2>/dev/null &
+```
+
+- **What is it doing right now** — the most recent items; an `item.started` without a matching `item.completed` is the action currently in flight (for `command_execution` you see the exact command):
+  ```bash
+  jq -r 'select(.type|startswith("item"))
+         | "\(.type) \(.item.type) \(.item.command // .item.text // "" | tostring | .[0:80])"' events.jsonl | tail -3
+  ```
+- **Is it stuck** — check the file's mtime: if `events.jsonl` stops growing for minutes, the agent is stalled at its last `item.started`.
+- **Is it done** — the stream ends with a `turn.completed` event (includes token usage); the last `agent_message` item is the final answer.
+- **Follow up** — interrogate or continue the same agent with `codex exec resume <thread_id>` (`thread_id` comes from the `thread.started` event).
+
+Verify deliverables yourself (the file exists, tests pass) rather than trusting the final message alone.
+
 ## Structured and machine-readable output
 
 - `--output-schema schema.json` — final answer is **pure JSON on stdout** conforming to the schema (no unwrapping needed).
