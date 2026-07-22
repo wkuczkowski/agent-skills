@@ -10,7 +10,7 @@ Workflow for driving Claude Code from a script or from another agent. Everything
 ## Core call
 
 ```bash
-claude -p "<task>" --allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode acceptEdits \
+claude -p "<task>" --allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode auto \
   --output-format json 2>err.log > out.json
 ```
 
@@ -39,7 +39,8 @@ claude -p "Follow-up: ..." --resume "$sid" --output-format json | jq -r .result
 
 ## Permissions
 
-- **Default: let it write.** `--allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode acceptEdits` — an agent that can create and edit files is far more useful. A blocked Write in `-p` mode fails silently, leaving the agent to describe work instead of doing it.
+- **Default: `--permission-mode auto` with write access.** `--allowedTools "Read,Glob,Grep,Write,Edit" --permission-mode auto` — an agent that can create and edit files is far more useful, and `auto` removes routine prompts while a background classifier still blocks genuinely dangerous actions (`curl | bash`, force-push, production deploys, `rm -rf /`). Requires Plan/Team/Enterprise and a recent model (Sonnet 4.6+/Opus 4.6+/Fable 5). A blocked Write in `-p` mode fails silently, leaving the agent to describe work instead of doing it.
+- Narrower fallbacks: `acceptEdits` auto-approves only file edits + basic FS commands; `dontAsk` denies everything outside `permissions.allow` — the docs' pick for locked-down CI.
 - Restrict to read-only (`--allowedTools "Read,Glob,Grep"`) only in the rare cases that demand it: untrusted prompts/inputs, pure analysis of a repo that must stay pristine, audits.
 - Scope Bash by prefix pattern: `--allowedTools "Bash(git diff *),Bash(ls *)"`.
 - Tools outside the allowlist are silently denied in `-p` mode — check `.permission_denials` when the agent reports it could not do something.
