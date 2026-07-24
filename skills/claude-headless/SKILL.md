@@ -66,6 +66,18 @@ Verify deliverables yourself (the file exists, tests pass) rather than trusting 
 - Tools outside the allowlist are silently denied in `-p` mode — check `.permission_denials` when the agent reports it could not do something.
 - Reserve `--dangerously-skip-permissions` for disposable sandboxes.
 
+## MCP servers
+
+Verified end-to-end: a project `.mcp.json` at the repo root is loaded automatically in `-p` mode, and allowlisting the server makes its tool calls run with zero approval prompts.
+
+```bash
+claude -p "<task using the MCP tools>" --allowedTools "mcp__my-server" --permission-mode auto --output-format json
+```
+
+- `.mcp.json` shape: `{"mcpServers": {"my-server": {"command": "/abs/path/cmd", "args": ["..."]}}}`. Absolute command paths are safest; relative `args` paths resolve against the cwd.
+- `--allowedTools "mcp__<server>"` allowlists **every** tool on that server; `mcp__<server>__<tool>` narrows to one tool. Without the allowlist entry MCP calls are silently denied like any other tool (check `.permission_denials`).
+- Extra servers ad hoc: `--mcp-config <file>`; `--strict-mcp-config` ignores all other MCP sources.
+
 ## Structured output
 
 ```bash

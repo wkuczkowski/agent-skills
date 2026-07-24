@@ -43,6 +43,28 @@ Always use the newest **Cursor Grok** model — currently `cursor-grok-4.5-high-
 - `--approve-mcps` auto-approves MCP servers; `--sandbox enabled|disabled` toggles the OS sandbox (Landlock+seccomp on Linux, workspace-scoped writes, network off by default).
 - Restrict to `--mode plan` or `--mode ask` (read-only) only when the task demands it: untrusted inputs, pure analysis, audits.
 
+## MCP servers
+
+Getting an MCP server working headless takes three pieces — all verified end-to-end (a stdio server was configured, auto-approved, and its tools called from `-p` with zero prompts):
+
+1. **Server config** — project `.cursor/mcp.json` (or global `~/.cursor/mcp.json`):
+
+   ```json
+   {"mcpServers": {"my-server": {"type": "stdio", "command": "/abs/path/to/cmd", "args": ["--directory", "/abs/path/to/project", "..."]}}}
+   ```
+
+   **Use absolute paths only.** IDE variables like `${userHome}` and `${workspaceFolder}` are NOT interpolated by the CLI — the server silently fails with "Connection failed" in `cursor-agent mcp list`.
+
+2. **Server approval (one-time per repo)** — a configured server still sits at "not loaded (needs approval)". Approve it once from the repo root: `cursor-agent mcp enable my-server`. Per-run alternative for scripts: pass `--approve-mcps`. Without either, the agent reports an empty MCP tool catalog.
+
+3. **Tool-call auto-approval** — so individual tool calls never wait for verification, add an allow rule to `.cursor/cli.json` (remember: both arrays required):
+
+   ```json
+   {"permissions": {"allow": ["Mcp(my-server:*)"], "deny": []}}
+   ```
+
+Diagnostics: `cursor-agent mcp list` (per-repo status — expect `my-server: ready`), `cursor-agent mcp list-tools my-server` (connects and lists tools with argument names). Check these before blaming the prompt when the agent says it has no MCP tools.
+
 ## Sessions
 
 ```bash

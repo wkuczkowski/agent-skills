@@ -68,6 +68,21 @@ codex exec --json -m gpt-5.6-sol --sandbox workspace-write "<long task>" > event
 
 Verify deliverables yourself (the file exists, tests pass) rather than trusting the final message alone.
 
+## MCP servers
+
+Verified end-to-end: `codex exec` loads MCP servers from config and calls their tools headless with no approval friction when the server sets `default_tools_approval_mode = "approve"`.
+
+```toml
+[mcp_servers.my-server]
+command = "uv"
+default_tools_approval_mode = "approve"
+args = ["--directory", "/abs/path/to/project", "run", "python", "-m", "my_server.main"]
+```
+
+- Lives in `~/.codex/config.toml` (global) or — verified working — a project-level `.codex/config.toml` in a trusted project root (`trust_level = "trusted"` under `[projects."<path>"]` in the global config).
+- With `default_tools_approval_mode = "approve"` the agent listed and called the server's tools under `--sandbox read-only` without any prompt or escalation.
+- Prefer absolute paths in `args`; relative paths resolve against the repo you launch from.
+
 ## Structured and machine-readable output
 
 - `--output-schema schema.json` — final answer is **pure JSON on stdout** conforming to the schema (no unwrapping needed).
