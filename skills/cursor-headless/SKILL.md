@@ -52,6 +52,18 @@ cursor-agent -p --trust --resume "$sid" "Follow-up: ..." --output-format json | 
 
 Resumed sessions keep full context (verified: recalled the output of a command run in the earlier turn). `--continue` resumes the most recent session when you did not capture the id; `cursor-agent ls` lists sessions.
 
+## Multitasking (parallel subagents)
+
+Cursor's multitasking — one agent spawning parallel subagents, each with its own context — **works headless**. Verified: two subagents ran concurrently, each got its own chat id, and the parent combined their reports. Trigger it by prefixing the prompt with `/multitask`, and be explicit — for a trivial task the model just does the work itself with direct edits:
+
+```bash
+cursor-agent -p --trust --force "/multitask Use parallel subagents: subagent 1 <task A>; subagent 2 <task B>. Combine both reports." \
+  --model cursor-grok-4.5-high-fast --output-format stream-json
+```
+
+- Subagent spawns show up in stream-json as `tool_call` events with a `taskToolCall` key carrying `.args.description` and `.args.prompt` — use that to watch what each subagent was asked to do.
+- The final `result` references each subagent by name and chat id; independent subtasks genuinely run in parallel while the parent waits.
+
 ## Monitoring a background run
 
 For long tasks, launch in the background with stream-json going to a file, then poll the file — each line is a JSONL event:
