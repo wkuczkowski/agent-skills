@@ -54,15 +54,35 @@ Resumed sessions keep full context (verified: recalled the output of a command r
 
 ## Multitasking (parallel subagents)
 
-Cursor's multitasking — one agent spawning parallel subagents, each with its own context — **works headless**. Verified: two subagents ran concurrently, each got its own chat id, and the parent combined their reports. Trigger it by prefixing the prompt with `/multitask`, and be explicit — for a trivial task the model just does the work itself with direct edits:
+Cursor's multitasking — one parent agent spawning parallel subagents, each in its own context window — **works headless**. Verified: two subagents ran concurrently, each got its own chat id, and the parent waited for both and combined their reports.
+
+### Spawning
+
+Prefix the prompt with `/multitask` and be explicit about the decomposition — for a trivial task the model skips subagents and just does the work itself with direct edits:
 
 ```bash
 cursor-agent -p --trust --force "/multitask Use parallel subagents: subagent 1 <task A>; subagent 2 <task B>. Combine both reports." \
-  --model cursor-grok-4.5-high-fast --output-format stream-json
+  --model cursor-grok-4.5-high-fast --output-format stream-json > stream.jsonl 2>/dev/null &
 ```
 
-- Subagent spawns show up in stream-json as `tool_call` events with a `taskToolCall` key carrying `.args.description` and `.args.prompt` — use that to watch what each subagent was asked to do.
-- The final `result` references each subagent by name and chat id; independent subtasks genuinely run in parallel while the parent waits.
+Give each subagent a self-contained brief (absolute paths included) — the parent forwards your decomposition nearly verbatim as each subagent's prompt.
+
+### Tracking subagent progress
+
+Everything arrives on the parent's stream-json; subagents' own tool calls are not streamed, so you track them via spawn events, the parent's narration, and post-hoc interrogation:
+
+- **What was spawned** — `tool_call` events with a `taskToolCall` key carry each subagent's `.args.description` and full `.args.prompt`:
+  ```bash
+  jq -r 'select(.type=="tool_call" and .subtype=="started") | .tool_call.taskToolCall | select(.) | .args.description' stream.jsonl
+  ```
+- **`taskToolCall completed` ≠ subagent finished.** It fires within milliseconds and only confirms the launch (`.result.success.agentId`, `isBackground: true`). Grab the `agentId` from it — that is the subagent's chat id:
+  ```bash
+  jq -r 'select(.type=="tool_call" and .subtype=="completed") | .tool_call.taskToolCall | select(.)
+         | .args.description + " " + (.result | fromjson | .success.agentId)' stream.jsonl
+  ```
+- **Which subagents are done** — the parent narrates completions in its `assistant` events and the final `result` names each subagent with its chat id ("[Count .txt lines](e8ede733-…) has completed").
+- **Interrogate a subagent** — subagent chats are resumable like any session (verified): `cursor-agent -p --trust --resume <agentId> "What did you find?"`. Use this after the run to pull details the parent's summary dropped, or mid-run to peek at a slow subagent.
+- Stuck-detection is the same as for a single run: if `stream.jsonl` stops growing for minutes while a `taskToolCall` spawn has no matching completion narration, the parent is stalled waiting on that subagent.
 
 ## Monitoring a background run
 
@@ -91,4 +111,4 @@ Verify deliverables yourself (the file exists, tests pass) rather than trusting 
 - **No structured-output schema flag.** Unlike `claude --json-schema` / `codex --output-schema`, output formats are only `text | json | stream-json`; if you need JSON data, ask for it in the prompt and parse `.result`.
 - **Put absolute paths in the prompt** and verify artifacts exist after the call — a blocked tool call in `-p` mode surfaces only in the agent's prose.
 - **Set generous timeouts.** A trivial question takes ~10 s; real work takes minutes.
-- Outside a git repo the CLI still works; `-w/--worktree` (isolated git worktree under `~/.cursor/worktrees/`) requires one. `--workspace <path>` sets the working root.
+- Outside a git repo the CLI still works; `--workspace <path>` sets the working root.
