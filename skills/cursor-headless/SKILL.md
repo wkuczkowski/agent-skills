@@ -5,42 +5,50 @@ description: Run Cursor Agent CLI programmatically via cursor-agent -p. Use when
 
 # Cursor headless (`cursor-agent -p`)
 
-Workflow for driving Cursor Agent CLI non-interactively. Everything below was verified by actually running it (cursor-agent 2026.07.23).
+Drive Cursor Agent CLI non-interactively. The commands below were checked with `cursor-agent 2026.09.02-c22c1a3`.
 
 ## Core call
 
 ```bash
-cursor-agent -p --trust --force "<task>" \
-  --model cursor-grok-4.5-high-fast --output-format json 2>err.log > out.json
+cursor-agent -p --trust --auto-review --sandbox disabled "<task>" \
+  --model cursor-grok-4.6-high-fast --output-format json 2>err.log > out.json
 ```
 
 - stdout carries exactly one JSON object — keep stderr redirected away from it.
 - Read from the JSON: `.result` (final answer), `.session_id`, `.is_error`, `.subtype` (`success`), `.usage` (token counts), `.request_id`.
-- Pipe input via stdin: `echo "data" | cursor-agent -p --trust "<prompt about the piped input>"` — stdin is appended to the prompt argument.
+- Pipe input via stdin: `echo "data" | cursor-agent -p --trust --auto-review --sandbox disabled --model cursor-grok-4.6-high-fast "<prompt about the piped input>"`. Stdin is appended to the prompt argument.
 - Exit codes: `0` success, `1` error (bad model, missing trust, auth failure) with the reason on stderr. Check both the exit code and `.is_error`.
 - **`--trust` is mandatory headless.** Without it the run dies with exit 1 and a "Workspace Trust Required" prompt on stderr.
-- Install: `curl https://cursor.com/install -fsS | bash` (lands in `~/.local/bin` as `cursor-agent` and `agent`). Auth: `cursor-agent login` (browser) or `CURSOR_API_KEY` env var for CI.
+- Install: `curl https://cursor.com/install -fsS | bash` (lands in `~/.local/bin` as `cursor-agent` and `agent`). Update with `cursor-agent update`. Auth: `cursor-agent login` (browser) or `CURSOR_API_KEY` env var for CI.
 
 ## Model
 
-Always use the newest **Cursor Grok** model — currently `cursor-grok-4.5-high-fast` (Cursor Grok 4.5 High Fast); when a newer `cursor-grok-*` ships, use that. Reasoning effort and serving speed are encoded in the slug: `cursor-grok-4.5-{low,medium,high}[-fast]`. Keep `high-fast` as the default; drop to `medium-fast`/`low-fast` only for trivial mechanical work.
+Always use `cursor-grok-4.6-high-fast` (Cursor Grok 4.6 High Fast). The slug fixes reasoning effort at `high` and enables Fast serving. Keep this model for every task unless the user explicitly requests another one.
 
 - `cursor-agent models` lists every valid slug for the account (also printed in the error when you pass a bad `--model`).
-- The `system/init` event in stream-json confirms the resolved model display name (e.g. "Cursor Grok 4.5 High Fast").
+- The `system/init` event in stream-json must confirm the resolved model display name `Cursor Grok 4.6 High Fast`.
 
 ## Permissions and approvals
 
-- **`-p` alone: file writes work, shell commands are rejected.** Verified: the agent created files fine but `git status` came back "rejected by the environment", leaving the agent to describe instead of do. So for any task involving shell, pass an approval flag.
-- **Default: `--force` (alias `--yolo`)** — auto-approves everything not explicitly denied. Pair it with hard `deny` rules (below) instead of running bare.
-- **`--auto-review` (Smart Auto)** — a server-side classifier auto-runs safe tool calls. Verified headless: a safe `ls` was auto-approved and executed without `--force`. Gentler than `--force`, but unsafe-classified calls have no human to prompt, so prefer `--force` + deny rules when the task must complete unattended.
-- **Deny rules beat `--force`.** Verified: with `Shell(rm)` denied, `--force` still could not run `rm` — the agent gets "Permission denied: Command blocked by permissions configuration" and can report it. Config lives in `.cursor/cli.json` (project) or `~/.cursor/cli-config.json` (global); **both `allow` and `deny` arrays are required** or the CLI exits 1 with a schema error:
+- Always pass `--auto-review --sandbox disabled`. Keep both flags in scripts even when the global config has the same values, so automation does not depend on interactive settings.
+- Auto-review sends Shell, MCP, and Fetch calls through Cursor's classifier. It may reject an operation or require human approval. Report that result instead of retrying with `--force`, `--yolo`, or `unrestricted`.
+- Auto-review is a convenience guardrail, not isolation. On this workstation the native Cursor sandbox is disabled because its AppArmor preflight fails. Keep access scoped through the task, workspace, CLI permissions, and the surrounding execution environment.
+- CLI permissions live in `.cursor/cli.json` for a project or `~/.cursor/cli-config.json` globally. Both `allow` and `deny` arrays are required. Keep the allowlist narrow because allowlisted calls bypass classifier review:
 
   ```json
-  {"permissions": {"allow": [], "deny": ["Shell(rm)", "Read(.env*)", "Write(**/*.key)"]}}
+  {
+    "version": 1,
+    "editor": {"vimMode": false},
+    "approvalMode": "auto-review",
+    "permissions": {"allow": ["Shell(ls)"], "deny": []},
+    "sandbox": {"mode": "disabled", "networkAccess": "user_config_with_defaults"}
+  }
   ```
 
   Rule syntax: `Shell(cmd)`, `Read(glob)`, `Write(glob)`, `WebFetch(domain)`, `Mcp(server:tool)`.
-- `--approve-mcps` auto-approves MCP servers; `--sandbox enabled|disabled` toggles the OS sandbox (Landlock+seccomp on Linux, workspace-scoped writes, network off by default).
+- `permissions.json` can steer the Auto-review classifier with plain-language `allow_instructions` and `block_instructions`. Add it only for recurring rules. It is guidance, not a security boundary.
+- If Cursor fixes the AppArmor preflight, test `--sandbox enabled` before changing this default. A working sandbox can then use `sandbox.json` for narrow network and filesystem exceptions.
+- `--approve-mcps` auto-approves configured MCP servers. Use it only when the task requires those servers.
 - Restrict to `--mode plan` or `--mode ask` (read-only) only when the task demands it: untrusted inputs, pure analysis, audits.
 
 ## MCP servers
@@ -68,8 +76,10 @@ Diagnostics: `cursor-agent mcp list` (per-repo status — expect `my-server: rea
 ## Sessions
 
 ```bash
-sid=$(cursor-agent -p --trust "Analyze X" --output-format json | jq -r .session_id)
-cursor-agent -p --trust --resume "$sid" "Follow-up: ..." --output-format json | jq -r .result
+sid=$(cursor-agent -p --trust --auto-review --sandbox disabled --model cursor-grok-4.6-high-fast \
+  "Analyze X" --output-format json | jq -r .session_id)
+cursor-agent -p --trust --auto-review --sandbox disabled --model cursor-grok-4.6-high-fast \
+  --resume "$sid" "Follow-up: ..." --output-format json | jq -r .result
 ```
 
 Resumed sessions keep full context (verified: recalled the output of a command run in the earlier turn). `--continue` resumes the most recent session when you did not capture the id; `cursor-agent ls` lists sessions.
@@ -83,8 +93,8 @@ Cursor's multitasking — one parent agent spawning parallel subagents, each in 
 Prefix the prompt with `/multitask` and be explicit about the decomposition — for a trivial task the model skips subagents and just does the work itself with direct edits:
 
 ```bash
-cursor-agent -p --trust --force "/multitask Use parallel subagents: subagent 1 <task A>; subagent 2 <task B>. Combine both reports." \
-  --model cursor-grok-4.5-high-fast --output-format stream-json > stream.jsonl 2>/dev/null &
+cursor-agent -p --trust --auto-review --sandbox disabled "/multitask Use parallel subagents: subagent 1 <task A>; subagent 2 <task B>. Combine both reports." \
+  --model cursor-grok-4.6-high-fast --output-format stream-json > stream.jsonl 2>/dev/null &
 ```
 
 Give each subagent a self-contained brief (absolute paths included) — the parent forwards your decomposition nearly verbatim as each subagent's prompt.
@@ -103,7 +113,7 @@ Everything arrives on the parent's stream-json; subagents' own tool calls are no
          | .args.description + " " + (.result | fromjson | .success.agentId)' stream.jsonl
   ```
 - **Which subagents are done** — the parent narrates completions in its `assistant` events and the final `result` names each subagent with its chat id ("[Count .txt lines](e8ede733-…) has completed").
-- **Interrogate a subagent** — subagent chats are resumable like any session (verified): `cursor-agent -p --trust --resume <agentId> "What did you find?"`. Use this after the run to pull details the parent's summary dropped, or mid-run to peek at a slow subagent.
+- **Interrogate a subagent** — subagent chats are resumable like any session (verified): `cursor-agent -p --trust --auto-review --sandbox disabled --model cursor-grok-4.6-high-fast --resume <agentId> "What did you find?"`. Use this after the run to pull details the parent's summary dropped, or mid-run to peek at a slow subagent.
 - Stuck-detection is the same as for a single run: if `stream.jsonl` stops growing for minutes while a `taskToolCall` spawn has no matching completion narration, the parent is stalled waiting on that subagent.
 
 ## Monitoring a background run
@@ -111,7 +121,7 @@ Everything arrives on the parent's stream-json; subagents' own tool calls are no
 For long tasks, launch in the background with stream-json going to a file, then poll the file — each line is a JSONL event:
 
 ```bash
-cursor-agent -p --trust --force "<long task>" --model cursor-grok-4.5-high-fast \
+cursor-agent -p --trust --auto-review --sandbox disabled "<long task>" --model cursor-grok-4.6-high-fast \
   --output-format stream-json > stream.jsonl 2>/dev/null &
 ```
 
@@ -123,10 +133,8 @@ cursor-agent -p --trust --force "<long task>" --model cursor-grok-4.5-high-fast 
   ```
 - **Is it stuck** — check the file's mtime: if `stream.jsonl` stops growing for minutes, the agent is stalled at its last `tool_call started`.
 - **Is it done** — the final line is a `result` event with the same fields as `--output-format json` (`.result`, `.session_id`, `.is_error`).
-- **Follow up** — after completion, interrogate or steer the same agent with `--resume <session_id>`.
+- **Follow up** — after completion, interrogate or steer the same agent with `--model cursor-grok-4.6-high-fast --resume <session_id>`.
 - `--stream-partial-output` adds per-token text deltas if you need live output.
-
-Verify deliverables yourself (the file exists, tests pass) rather than trusting the final message alone.
 
 ## Gotchas
 
