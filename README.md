@@ -8,6 +8,10 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 ## Skills
 
+### Workflows
+
+- **workflow-from-chats** — extract reusable skills and proposed changes from Codex and Claude Code conversations, with user evidence, fork deduplication, and a local HTML report based on the bundled Folk template.
+
 ### Agent CLIs
 
 - **claude-headless** — run Claude Code programmatically via the headless CLI (`claude -p`): output parsing, session resume, permissions, structured output, verified gotchas.
