@@ -1,65 +1,54 @@
 ---
 name: claude-headless
-description: Use when you need Anthropic's Fable model and are working outside the Claude Code harness. Runs Claude Code headlessly with high reasoning effort.
+description: Use when you need Anthropic's Fable model and are working outside the Claude Code harness. Runs Claude Code headlessly
 ---
 
-# Claude Code headless (`claude -p`)
+# Claude Code headless
 
-Drive Claude Code non-interactively. These instructions target Claude Code `2.1.260`.
+Use `claude -p` for bounded delegated work. Default to `--model fable --effort medium`, unless the user specifies another model or effort. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.261.
 
-## Choose a run
+## Choose reasoning effort
 
-Use this for a one-shot task:
+Use `medium` for most tasks, including design/UI changes, styling, routine implementation, focused fixes, research, and ordinary reviews. Reserve `high` for the hardest tasks: difficult architectural trade-offs, elusive concurrency bugs, or changes with complex interacting constraints that require deep reasoning. Task length or file count alone does not justify high.
+
+Choose between medium and high for each task or follow-up based on its actual complexity. A routine design correction after a high-effort architecture task should use medium. Honor an explicit user choice. The examples below use the default medium; replace it with high only when the task warrants it.
+
+## Choose the workflow
+
+- **One-shot consultation or extraction:** JSON output, no session persistence. Provide the needed context and a concrete deliverable.
+- **Implementation or follow-up review:** persisted session, stream JSON, one owner responsible for launch, monitoring, and resumption. Read [delegation and review](references/delegation-and-review.md) and [sessions and monitoring](references/sessions-and-monitoring.md) before launching.
+- **MCP or structured output:** read [MCP and structured output](references/mcp-and-structured-output.md).
+- **CLI failure, stalled output, uncertain process state, or exhausted quota:** read [problem reporting](references/problem-reporting.md) before retrying.
+
+A one-shot request:
 
 ```bash
-claude -p "<task>" \
-  --model fable --effort high \
+claude -p "<bounded task>" \
+  --model fable --effort medium \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --no-session-persistence \
-  --output-format json 2>err.log >out.json
+  --output-format json >out.json 2>err.log
 ```
 
-- Always pass `--model fable --effort high`.
-- Always pass `--permission-mode auto --permission-prompts none`.
-- Use `--strict-mcp-config` when the task needs no MCP server. It excludes account connectors and repository MCP configuration.
-- Remove `--no-session-persistence` when the task may need `--resume`.
-- For resumable or long-running work, read [sessions and monitoring](references/sessions-and-monitoring.md).
-- For MCP or schema-validated output, read [MCP and structured output](references/mcp-and-structured-output.md).
+Run from the intended repository using the calling tool's working-directory parameter. Store prompts and logs in a private per-run directory. For longer prompts, use a file as stdin rather than interpolating its contents into shell code. Piped stdin is appended to the prompt and has a 10 MB limit; pass paths for larger inputs.
 
-If the CLI itself fails, hangs, selects an unavailable model, emits malformed output, or cannot initialize its sandbox or permissions, read [problem reporting](references/problem-reporting.md). Record the sanitized failure, tell the user where the report is, and continue with unaffected work.
+## Report run status and task acceptance separately
 
-## Output and completion
+1. **Run completed:** retain the actual process exit code and parse the terminal `result` object. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit.
+2. **Task accepted:** inspect the deliverable and verify the required behavior against the actual changed files. A clean Claude result is not a code review or proof of user-facing correctness.
 
-- Successful JSON mode writes one object to stdout. Inspect the process exit code, stderr, `.is_error`, `.subtype`, `.terminal_reason`, and `.permission_denials`.
-- Completion requires exit `0`, `.is_error: false`, `.subtype: success`, and `.terminal_reason: completed`.
-- Read the final text from `.result`. Other useful fields include `.session_id`, `.num_turns`, `.usage`, `.modelUsage`, and `.total_cost_usd`.
-- `.modelUsage` normally contains `claude-fable-5-1` for the task and a smaller classifier model such as `claude-haiku-4-5` for Auto mode. The classifier entry does not mean the task switched away from Fable.
-- CLI and sandbox preflight errors can exit before producing JSON. An in-run failure may still produce a JSON result.
-- Piped stdin is appended to the prompt and is limited to 10 MB. Put larger inputs in a file and name its absolute path.
+A failed or interrupted run can leave useful, acceptable work. Report that run as failed/interrupted and accept its saved artifact only after independent verification. Resolve writer liveness before another agent edits the same files.
 
-## Authentication and updates
+Read final text from `.result`, structured data from `.structured_output` when requested. `.session_id` is the conversation ID, not the calling tool's process/session handle. `.modelUsage` may contain Fable for the task and Haiku for Auto classification; that alone is not a model switch. Check the task model against the user's selection.
 
-- Check the installation with `claude --version`, `claude doctor`, and `claude auth status`.
-- Native installations update in the background. `claude update` applies an update immediately.
-- Claude.ai login works in normal print mode. `--bare` ignores OAuth and keychain credentials, so use it only with `ANTHROPIC_API_KEY`, `apiKeyHelper`, or a supported cloud provider.
+CLI startup errors may produce no JSON. In-run errors can still produce a result, even one with `subtype: success`. Keep stdout and stderr separate, and do not pipe away the process exit status before checking it.
 
-## Permissions
+## Permissions and authentication
 
-- Keep Auto mode enabled for every run. A blocked action is a result to report or solve within the existing controls.
-- `--allowedTools` adds pre-approval rules. It does not remove unlisted tools and can bypass classifier checks.
-- Use `--tools` or a bare `--disallowedTools ToolName` entry to remove a tool. Use a scoped deny such as `--disallowedTools "Bash(rm *)"` to block matching calls while keeping other Bash calls.
-- Use `dontAsk` with narrow allow rules for a fixed allowlist. Use `plan` for read-only planning.
-- Do not retry with `bypassPermissions` or `--dangerously-skip-permissions`.
+Keep `--permission-mode auto --permission-prompts none`. Inherit existing sandbox settings; do not alter global or project configuration merely to get a run through. For read-only work, state that scope and restrict available tools when useful while retaining Auto.
 
-## Sandbox
+Use `--strict-mcp-config` when no MCP server is needed. It excludes account and repository MCP configuration, not hooks, plugins, or all other customization. `--tools` selects available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary. Resolve blocked actions within existing controls; do not switch to permission bypass.
 
-Inherit Claude Code's existing sandbox settings when launching `claude -p`. The user's default is sandboxing disabled. Keep sandbox configuration out of launch flags and `--settings` overrides, and leave global and project settings unchanged unless the user requests a change.
+Use the data access already authorized by the user. Ask only when a new boundary actually needs approval, not again for the same approved scope. Keep credentials out of prompts, result excerpts, and reports. Account privacy/retention terms depend on the service and settings; verify them when relevant rather than assuming all Claude launches use one account type.
 
-Auto mode remains required whether sandboxing is enabled or disabled. It controls action approvals independently of sandboxing.
-
-## Data handling
-
-- Claude Max is a consumer account. Fable 5.1 requires at least 30 days of server-side retention. Model Improvement can extend consumer-data retention.
-- Persisted local transcripts are plaintext under `~/.claude/projects` and default to 30-day cleanup.
-- Use `--no-session-persistence` when resumption is unnecessary.
-- Use the Claude Agent SDK instead of shell parsing when building an application around the agent loop.
+For authentication problems, use `claude auth status`; for CLI health, `claude doctor`. Normal print mode supports Claude.ai login. `--bare` skips OAuth/keychain authentication and is not a drop-in optimization for a subscription session. Native installations may update independently; do not update the CLI during a task unless needed and authorized.

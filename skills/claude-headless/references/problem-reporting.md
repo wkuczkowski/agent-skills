@@ -1,11 +1,22 @@
-# Problem reporting
+# Problems and recovery
 
-Use this procedure for a Claude CLI or harness problem, not for a bug in the user's task or an ordinary model mistake. Relevant problems include authentication, unavailable or misresolved models, transport errors, startup state, sandbox initialization, permission plumbing, malformed output, crashes, and stalls.
+Use this for CLI/harness failures, not ordinary defects in the delegated code.
 
-1. Preserve the failed run's stdout and stderr when available.
-2. Write a Markdown report under `~/.local/state/headless-harness-reports/claude/`. Use `/tmp/headless-harness-reports/claude/` if the parent sandbox cannot write there. Do not request broader access only to store the report.
-3. Name it `YYYYMMDD-HHMMSS-<short-slug>.md`.
-4. Include the timestamp, CLI version, working directory, sanitized command and flags, exit code, failure phase, a short stderr excerpt, `.terminal_reason`, `.permission_denials`, relevant `.modelUsage`, and the recovery attempted.
-5. Exclude prompts, source data, environment dumps, tokens, credentials, account identifiers, and unrelated configuration.
-6. Tell the user what failed, its impact, and the report path.
-7. Continue unaffected work. Retry once when the failure looks transient, or use a documented alternative that preserves Fable, high effort, Auto mode, and sandbox settings. Leave only the affected part incomplete when no safe route remains.
+| Observation | Next step |
+|---|---|
+| Missing terminal result or quiet log | Check the original execution handle and process visibility before declaring termination or restarting. |
+| Exit 143 | Record interruption. Establish whether the parent intentionally sent SIGTERM; otherwise the sender/cause is unknown until evidenced. Inspect saved edits before a confirmed-safe resume. |
+| Account quota exhausted with reset time | Preserve the checkpoint and report reset time with its timezone. Stop retrying that quota. Continue independent work or an already authorized model alternative. |
+| Transient transport error | One bounded retry after confirmed termination, if it fits the task's deadline. Repeated errors need diagnosis, not a restart loop. |
+| Auto/host approval denial | Identify the actual denied action. Use existing authorization and a permitted alternative; request approval only for a genuinely missing boundary. Keep Auto and inherited sandbox settings. |
+| Exit 0 and clean result, but a required check failed or was not run | Treat implementation as unaccepted; return the specific finding or missing check. |
+
+An observed `subtype: success` occurred with `is_error: true`, `terminal_reason: api_error`, exit 1 and exhausted quota. Checking subtype alone loses this failure. An unexpected exit near a Bash timeout is a correlation, not proof of which timer or process sent a signal.
+
+## Save useful evidence
+
+Preserve raw run outputs privately. Write a sanitized report under `~/.local/state/headless-harness-reports/claude/`, or `/tmp/headless-harness-reports/claude/` when the parent cannot write there. Do not request extra access just to store this report. Use `YYYYMMDD-HHMMSS-<slug>.md`.
+
+Include version, working directory, launch/last-event/end times, sanitized flags, actual exit status or unknown, result-field summaries, denied actions, and recovery tried. Separate confirmed facts, hypotheses, and missing evidence. Keep credentials, account identifiers, full prompts, private source/transcripts, and environment dumps out of the report. Tell the user the impact and report location.
+
+After an interrupted implementation, record what was saved, which version was reviewed, which tests actually ran, and what remains. An interrupted agent's partial work may be accepted through independent verification; neither an interruption nor a successful message alone decides artifact quality.
