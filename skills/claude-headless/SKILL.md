@@ -53,35 +53,13 @@ If the CLI itself fails, hangs, selects an unavailable model, emits malformed ou
 
 ## Sandbox
 
-Claude's sandbox covers Bash commands and their child processes. Built-in Read, Edit, and Write tools remain governed by permissions.
+Inherit Claude Code's existing sandbox settings when launching `claude -p`. The user's default is sandboxing disabled. Keep sandbox configuration out of launch flags and `--settings` overrides, and leave global and project settings unchanged unless the user requests a change.
 
-- Linux sandboxing requires `bubblewrap`, `socat`, and a working AppArmor user-namespace profile for `bwrap`.
-- `autoAllowBashIfSandboxed: true` removes prompts for commands that stay inside the sandbox.
-- `failIfUnavailable: true` stops the run instead of silently falling back to unsandboxed execution.
-- `allowUnsandboxedCommands: true` lets Claude request an incompatible command outside the sandbox. Auto mode still reviews the request, and `--permission-prompts none` denies unresolved requests.
-- Add filesystem, network, or excluded-command exceptions only for a concrete task.
-
-The matching global baseline in `~/.claude/settings.json` is:
-
-```json
-{
-  "model": "fable",
-  "effortLevel": "high",
-  "permissions": {"defaultMode": "auto"},
-  "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": true,
-    "failIfUnavailable": true,
-    "allowUnsandboxedCommands": true
-  }
-}
-```
-
-Preserve existing deny rules when adding this baseline.
+Auto mode remains required whether sandboxing is enabled or disabled. It controls action approvals independently of sandboxing.
 
 ## Data handling
 
 - Claude Max is a consumer account. Fable 5.1 requires at least 30 days of server-side retention. Model Improvement can extend consumer-data retention.
 - Persisted local transcripts are plaintext under `~/.claude/projects` and default to 30-day cleanup.
-- Use `--no-session-persistence` when resumption is unnecessary. Keep client or regulated data out of consumer Claude sessions.
+- Use `--no-session-persistence` when resumption is unnecessary.
 - Use the Claude Agent SDK instead of shell parsing when building an application around the agent loop.
