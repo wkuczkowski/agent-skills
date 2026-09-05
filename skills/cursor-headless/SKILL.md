@@ -1,6 +1,6 @@
 ---
 name: cursor-headless
-description: Run Cursor Agent CLI programmatically via cursor-agent -p. Use when delegating a task to a Cursor agent, scripting cursor-agent in shell or CI, or when the user mentions running Cursor headless or programmatically.
+description: Use when you need the Grok model available through Cursor and are working outside the Cursor harness. Runs Cursor Agent headlessly with Grok 4.6 High Fast.
 ---
 
 # Cursor headless (`cursor-agent -p`)

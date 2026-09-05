@@ -1,6 +1,6 @@
 ---
 name: claude-headless
-description: Run Claude Code programmatically via the headless CLI (claude -p). Use when delegating a task to a separate Claude Code instance, scripting claude in shell or CI, or when the user mentions running Claude Code headless or programmatically.
+description: Use when you need Anthropic's Fable model and are working outside the Claude Code harness. Runs Claude Code headlessly with high reasoning effort.
 ---
 
 # Claude Code headless (`claude -p`)

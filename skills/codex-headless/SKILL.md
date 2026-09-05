@@ -1,6 +1,6 @@
 ---
 name: codex-headless
-description: Run OpenAI Codex CLI programmatically via codex exec. Use when delegating a task to a Codex agent, scripting codex in shell or CI, or when the user mentions running Codex headless or programmatically.
+description: Use when you need OpenAI's Astra model and are working outside the Codex harness. Runs Codex CLI headlessly with Low or High reasoning effort chosen for the task.
 ---
 
 # Codex headless (`codex exec`)
@@ -23,7 +23,7 @@ Use this for a one-shot task:
 
 ```bash
 codex exec --ephemeral --json --skip-git-repo-check \
-  -m gpt-5.6-sol -c model_reasoning_effort=low \
+  -m gpt-6-astra -c model_reasoning_effort=low \
   --sandbox workspace-write \
   -c approval_policy=on-request -c approvals_reviewer=auto_review \
   "<task>" >events.jsonl 2>progress.log
@@ -58,12 +58,12 @@ If the CLI itself fails, hangs, selects an unavailable model, emits malformed ou
 
 ## Model and effort
 
-Always use the newest flagship `sol` variant, currently `gpt-5.6-sol`.
+Use OpenAI Astra (`gpt-6-astra`) with either `low` or `high` reasoning effort. Choose by the depth of reasoning required, ambiguity, and interacting constraints, rather than task length or file count.
 
-- `low` for mechanical edits, formatting, renames, and simple questions.
-- `medium` for feature work, bug fixes, and multi-file refactors.
-- `high` for difficult debugging, architecture, and security work.
-- Use `xhigh` only after `high` proves insufficient.
+- **Astra Low:** well-defined tasks with a clear approach, such as routine edits, straightforward fixes, focused lookups, and implementation from an established plan.
+- **Astra High:** tasks requiring substantial judgment or reasoning across several steps, such as ambiguous requirements, architecture tradeoffs, difficult debugging, security analysis, and changes with complex interactions.
+
+Pass `-m gpt-6-astra` and `-c model_reasoning_effort=low` or `high` explicitly on every invocation, including resumed sessions. Reassess effort when the task changes; choose `high` when unresolved uncertainty could materially affect correctness. Use another model or effort level only when the user requests it.
 
 ## Sandbox and approvals
 
