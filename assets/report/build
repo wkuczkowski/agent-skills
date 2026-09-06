@@ -1,0 +1,194 @@
+#!/usr/bin/env python3
+"""Build a report for the user on the Folk house template.
+
+  assets/report/build SECTIONS.html --out OUT.html --title T [options]
+
+SECTIONS.html is a fragment: one <section id="..."> per report section, each
+starting with an <h2>. The script numbers the sections, builds the contents,
+fills the header, expands data-src on <pre>, colours diffs, and checks the
+result (anchors resolve, ids unique, nothing loads from the network).
+
+Options:
+  --title T          document title (required)
+  --subtitle S       one sentence under the title
+  --eyebrow E        small caps line above the title, e.g. "manage-skills · weekly"
+  --description D    <meta name=description>; defaults to the subtitle
+  --chip "K=V"       header chip, repeatable, e.g. --chip "Window=12 weeks"
+  --foot TEXT        footer paragraph (who wrote it, from what, when)
+  --out PATH         output file (required)
+
+Section fragment rules:
+  <section id="usage"><h2>Usage per skill and harness</h2> ... </section>
+    id: unique, lowercase letters, digits, hyphens; becomes the anchor
+    h2: first element inside the section; becomes the heading and contents entry
+  <pre class="code" data-src="usage.txt"></pre>
+    replaced by the file's content, HTML-escaped; path relative to SECTIONS.html
+  <pre class="diff" data-src="x.diff"></pre> or <pre class="diff">inline escaped diff</pre>
+    lines are wrapped: +add, -del, @@hunk, ---/+++ meta
+  Everything else is plain HTML using the classes listed in README.md.
+
+Exit 1 on a check failure; the file is still written so the failure can be read.
+"""
+
+from __future__ import annotations
+
+import argparse
+import html
+import re
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+TEMPLATE = HERE / "template.html"
+
+SECTION_RE = re.compile(r"<section\b([^>]*)>(.*?)</section>", re.S | re.I)
+ID_RE = re.compile(r'\bid\s*=\s*"([^"]+)"', re.I)
+H2_RE = re.compile(r"\s*<h2\b[^>]*>(.*?)</h2>\s*", re.S | re.I)
+PRE_RE = re.compile(r"<pre\b([^>]*)>(.*?)</pre>", re.S | re.I)
+CLASS_RE = re.compile(r'\bclass\s*=\s*"([^"]*)"', re.I)
+SRC_RE = re.compile(r'\bdata-src\s*=\s*"([^"]+)"', re.I)
+HREF_RE = re.compile(r'\bhref\s*=\s*"#([^"]+)"', re.I)
+ANY_ID_RE = re.compile(r'\bid\s*=\s*"([^"]+)"', re.I)
+REMOTE_RE = re.compile(r'\b(?:src|href)\s*=\s*"(https?:)?//[^"]*"', re.I)
+
+
+def diff_lines(text: str) -> str:
+    out = []
+    for line in text.split("\n"):
+        if line.startswith("+++") or line.startswith("---"):
+            cls = "meta"
+        elif line.startswith("@@"):
+            cls = "hunk"
+        elif line.startswith("+"):
+            cls = "add"
+        elif line.startswith("-"):
+            cls = "del"
+        else:
+            cls = None
+        out.append(f'<span class="{cls}">{line}</span>' if cls else line)
+    return "\n".join(out)
+
+
+def expand_pre(body: str, base: Path, problems: list[str]) -> str:
+    def repl(m: re.Match) -> str:
+        attrs, inner = m.group(1), m.group(2)
+        classes = (CLASS_RE.search(attrs) or [None, ""])[1].split()
+        src = SRC_RE.search(attrs)
+        if src:
+            path = Path(src.group(1))
+            if not path.is_absolute():
+                path = base / path
+            try:
+                inner = html.escape(path.read_text(errors="replace").rstrip("\n"))
+            except OSError as e:
+                problems.append(f"data-src {src.group(1)}: {e}")
+                inner = html.escape(f"[missing: {src.group(1)}]")
+            attrs = SRC_RE.sub("", attrs)
+        if "diff" in classes:
+            inner = diff_lines(inner)
+        return f"<pre{attrs}>{inner}</pre>"
+
+    return PRE_RE.sub(repl, body)
+
+
+def build(args: argparse.Namespace) -> int:
+    problems: list[str] = []
+    src_path = Path(args.sections)
+    fragment = src_path.read_text()
+    base = src_path.resolve().parent
+
+    sections = SECTION_RE.findall(fragment)
+    if not sections:
+        problems.append("no <section> elements in the fragment")
+    if "<section" in fragment and len(sections) != fragment.lower().count("<section"):
+        problems.append("nested or unclosed <section> found; sections must be flat")
+
+    toc, rendered, ids = [], [], []
+    for n, (attrs, body) in enumerate(sections):
+        m_id = ID_RE.search(attrs)
+        sid = m_id.group(1) if m_id else f"s{n}"
+        if not m_id:
+            problems.append(f"section {n} has no id; using {sid}")
+        if not re.fullmatch(r"[a-z][a-z0-9-]*", sid):
+            problems.append(f"section id {sid!r} is not lowercase letters, digits and hyphens")
+        if sid in ids:
+            problems.append(f"duplicate section id {sid!r}")
+        ids.append(sid)
+        m_h2 = H2_RE.match(body)
+        if not m_h2:
+            problems.append(f"section {sid} does not start with <h2>")
+            title, rest = sid, body
+        else:
+            title, rest = m_h2.group(1).strip(), body[m_h2.end():]
+        num = f"{n:02d}"
+        plain = re.sub(r"<[^>]+>", "", title)
+        toc.append(f'      <li><a href="#{sid}"><b>{num}</b><span>{plain}</span></a></li>')
+        rest = expand_pre(rest, base, problems)
+        rendered.append(
+            f'    <section class="section" id="{sid}">\n'
+            f'      <div class="section__head">\n'
+            f'        <span class="n">{num}</span><h2>{title}</h2>\n'
+            f'        <a class="anchor" href="#{sid}" aria-label="Link to section {num}">#</a>\n'
+            f"      </div>\n{rest.strip()}\n    </section>\n"
+        )
+
+    chips = "\n".join(
+        f'    <span class="chip"><i>{html.escape(k.strip())}</i><b>{html.escape(v.strip())}</b></span>'
+        for k, _, v in (c.partition("=") for c in args.chip or [])
+    )
+    subtitle = args.subtitle or ""
+    doc = TEMPLATE.read_text()
+    for key, val in {
+        "TITLE": html.escape(args.title),
+        "DESCRIPTION": html.escape(args.description or subtitle),
+        "EYEBROW": html.escape(args.eyebrow or ""),
+        "SUBTITLE": html.escape(subtitle),
+        "CHIPS": chips,
+        "TOC": "\n".join(toc),
+        "SECTIONS": "\n".join(rendered),
+        "FOOT": html.escape(args.foot or ""),
+    }.items():
+        doc = doc.replace("{{" + key + "}}", val)
+
+    # checks on the finished document
+    if "{{" in doc:
+        problems.append("unfilled placeholder left in the document")
+    all_ids = ANY_ID_RE.findall(doc)
+    dupes = sorted({i for i in all_ids if all_ids.count(i) > 1})
+    if dupes:
+        problems.append(f"duplicate ids: {', '.join(dupes)}")
+    known = set(all_ids)
+    missing = sorted({h for h in HREF_RE.findall(doc) if h not in known})
+    if missing:
+        problems.append(f"anchors without a target: {', '.join(missing)}")
+    remote = REMOTE_RE.findall(doc)
+    if remote:
+        problems.append(f"{len(remote)} src/href point at the network; the report must be offline")
+    if "<script src" in doc or '<link rel="stylesheet"' in doc:
+        problems.append("external script or stylesheet in the document")
+
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(doc)
+    size = out.stat().st_size
+    print(f"wrote {out} ({size // 1024} KiB, {len(sections)} sections: {', '.join(ids)})")
+    for p in problems:
+        print(f"problem: {p}")
+    return 1 if problems else 0
+
+
+def main(argv: list[str]) -> int:
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("sections")
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--title", required=True)
+    ap.add_argument("--subtitle")
+    ap.add_argument("--eyebrow")
+    ap.add_argument("--description")
+    ap.add_argument("--chip", action="append")
+    ap.add_argument("--foot")
+    return build(ap.parse_args(argv))
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

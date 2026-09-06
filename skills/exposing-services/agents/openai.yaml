@@ -1,0 +1,4 @@
+interface:
+  display_name: "Exposing Services"
+  short_description: "Open a port to the company LAN or diagnose why it is closed"
+  default_prompt: "Use $exposing-services to make this service reachable from the LAN."

@@ -1,2 +1,6 @@
+interface:
+  display_name: "Workflow from chats"
+  short_description: "Proposals for skills and rules mined from recent chats"
+  default_prompt: "Use $workflow-from-chats to propose skills and instruction changes from the conversations since the last run."
 policy:
   allow_implicit_invocation: false

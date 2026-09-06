@@ -1,7 +1,7 @@
-# Ignore everything by default
+# Whitelist: only what is listed below reaches GitHub.
 /*
-
-# Track gitignore, README, and skills
 !/.gitignore
 !/README.md
 !/skills/
+!/skills-lock.json
+!/assets/

@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<style>
+/* ==========================================================================
+   TOKENS. The only place where values are defined.
+   Folk palette: paper beige marks structure on a white ground; statuses are
+   told apart by pastel fills, labels, icons and border shapes.
+   Fonts: Karla and IBM Plex Mono when installed locally, system stacks
+   otherwise. The document loads nothing from the network.
+   ========================================================================== */
+:root {
+  /* Folk's original paper-tile.png, unprocessed; natural size 158 x 146 px. */
+  --folk-grain: url("data:image/png;base64,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");
+  /* Ground and text */
+  --bg:        #FFFFFF;
+  --paper:     #F7F3EF;
+  --sunk:      #F7F3EF;
+  --band:      #F7F3EF;
+  --ink:       #030200E3;
+  --muted:     #030200E3;
+  --faint:     #030200E3;
+  --line:      #030200E3;
+  --line-soft: #030200E3;
+  --rule:      #030200E3;
+
+  /* Structural accent */
+  --accent:      #302B26;
+  --accent-ink:  #302B26;
+  --accent-soft: #F7F3EF;
+
+  /* Semantic states */
+  --ok:        #030200E3;
+  --ok-ink:    #030200E3;
+  --ok-soft:   #E3EFDC;
+  --no:        #884340;
+  --no-ink:    #713735;
+  --no-soft:   #F4DAD5;
+  --warn:      #030200E3;
+  --warn-ink:  #030200E3;
+  --warn-soft: #FFF0BD;
+  --alarm:      #884340;
+  --alarm-fill: #F4DAD5;
+  --alarm-on:   #713735;
+  --alarm-soft: #F4DAD5;
+  --note:      #030200E3;
+  --note-ink:  #030200E3;
+  --note-soft: #BEE0EF;
+
+  /* Typography */
+  --font-body: 'Karla', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* Spacing scale */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-7: 32px; --sp-8: 40px;
+  --sp-9: 48px; --sp-10: 64px;
+
+  /* Page margins grow with the screen */
+  --gutter: var(--sp-5);
+  --measure: 68ch;
+}
+
+@media (min-width: 720px)  { :root { --gutter: var(--sp-7); } }
+@media (min-width: 1040px) { :root { --gutter: var(--sp-9); } }
+
+/* ==========================================================================
+   RESET AND BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+* { border-radius: 0; }                    /* Folk's straight edges */
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: var(--accent-ink); text-underline-offset: 2px; }
+a:hover { color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; }
+h3 { font-size: 18px; margin: var(--sp-6) 0 var(--sp-3); }
+h4 { font-size: 16px; margin: var(--sp-5) 0 var(--sp-2); }
+p { margin: 0 0 var(--sp-4); text-wrap: pretty; }
+p:last-child { margin-bottom: 0; }
+strong { font-weight: 700; }
+code, .mono { font-family: var(--font-mono); }
+code { font-size: 0.92em; background: var(--paper); padding: 1px 4px; }
+pre code { font-size: inherit; background: none; padding: 0; }
+ul, ol { margin: 0 0 var(--sp-4); padding-left: 1.4em; }
+li { margin-bottom: var(--sp-1); }
+hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-6) 0; }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--ink); color: var(--paper); padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono); font-size: 13px;
+}
+.skip:focus { left: 0; }
+
+/* Monospace label, repeated across the system */
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+/* ==========================================================================
+   DOCUMENT HEADER
+   ========================================================================== */
+.doc-head {
+  background: var(--band) var(--folk-grain) repeat; background-size: auto;
+  padding: var(--sp-7) 0;
+  border-bottom: 1px solid var(--line);
+}
+.doc-head__in { max-width: 1360px; margin: 0 auto; padding: 0 var(--gutter); }
+.doc-head .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--accent-ink);
+  margin-bottom: var(--sp-4);
+}
+.doc-head h1 {
+  font-size: clamp(1.75rem, 1.1rem + 3.2vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-3);
+  max-width: 26ch;
+}
+.doc-head .sub {
+  font-size: clamp(1rem, 0.92rem + 0.5vw, 1.25rem);
+  color: var(--muted);
+  max-width: 48ch;
+  margin-bottom: var(--sp-6);
+}
+.chips { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.chip { background: #fff; padding: 6px var(--sp-3); font-size: 13px; border: 1px solid var(--line); }
+.chip i {
+  font-style: normal; font-family: var(--font-mono);
+  font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--faint); margin-right: var(--sp-2);
+}
+.chip b { font-weight: 600; }
+
+/* ==========================================================================
+   MOBILE BAR. Sticky; shows the current section and opens the contents.
+   Disappears at the width where the contents become a side column.
+   ========================================================================== */
+.bar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: stretch;
+  background: var(--paper) var(--folk-grain) repeat; background-size: auto;
+  border-bottom: 1px solid var(--rule);
+}
+.bar__btn {
+  display: flex; align-items: center; gap: var(--sp-2);
+  background: none; border: 0; border-right: 1px solid var(--line);
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink); cursor: pointer;
+  min-height: 44px;                          /* touch target */
+}
+.bar__btn:hover { background: var(--sunk) var(--folk-grain) repeat; background-size: auto; }
+.bar__now {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: 14px; color: var(--muted);
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.bar__now b { color: var(--accent); font-family: var(--font-mono); font-size: 11px; font-weight: 400; }
+.bar__prog { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--accent); width: 0; }
+
+/* ==========================================================================
+   CONTENTS. Mobile: a drawer under the bar. Desktop: a sticky side column.
+   ========================================================================== */
+.toc { background: var(--paper) var(--folk-grain) repeat; background-size: auto; border-bottom: 1px solid var(--line); }
+.toc[hidden] { display: none; }
+.toc__head { display: none; }
+.toc__prog { display: none; }
+.toc ol { list-style: none; margin: 0; padding: var(--sp-2) 0; }
+.toc a {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--sp-2);
+  padding: var(--sp-3) var(--gutter);
+  min-height: 44px; align-items: center;
+  color: var(--muted); text-decoration: none;
+  font-size: 15px; line-height: 1.35;
+}
+.toc a b { font-family: var(--font-mono); font-size: 11px; font-weight: 400; color: var(--faint); }
+.toc a:hover { background: var(--sunk) var(--folk-grain) repeat; background-size: auto; color: var(--ink); }
+.toc a[aria-current="true"] { background: var(--accent-soft) var(--folk-grain) repeat; background-size: auto; color: var(--accent-ink); font-weight: 700; }
+.toc a[aria-current="true"] b { color: var(--accent-ink); }
+.toc a[hidden] { display: none; }
+
+/* ==========================================================================
+   SEARCH
+   ========================================================================== */
+.search { padding: 0 var(--gutter) 0; margin-bottom: var(--sp-6); }
+.search__box {
+  display: flex; align-items: center; gap: var(--sp-2);
+  background: #fff; border: 3px double var(--line);
+  padding: 0 var(--sp-3);
+}
+.search__box:focus-within { border-color: var(--accent); outline: 2px solid var(--ink); outline-offset: 2px; }
+.search__box svg { flex: 0 0 auto; color: var(--faint); }
+.search input {
+  flex: 1; min-width: 0;
+  border: 0; background: none; outline: none;
+  font-family: var(--font-body); font-size: 16px; color: var(--ink);
+  padding: var(--sp-3) 0; min-height: 44px;
+}
+.search input::placeholder { color: var(--faint); }
+.search__clear {
+  border: 0; background: none; cursor: pointer; color: var(--faint);
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: var(--sp-2);
+}
+.search__clear:hover { color: var(--ink); }
+.search__count {
+  font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+  margin-top: var(--sp-2);
+}
+.search__count:empty { display: none; }
+mark { background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto; color: var(--ink); box-shadow: inset 0 -2px 0 var(--warn); }
+
+/* ==========================================================================
+   CONTENT LAYOUT
+   ========================================================================== */
+.shell { padding: var(--sp-7) var(--gutter) var(--sp-10); }
+.doc { min-width: 0; }
+.section { margin-bottom: var(--sp-8); scroll-margin-top: 72px; }
+.section[hidden] { display: none; }
+
+.section__head {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--sp-3);
+  margin-bottom: var(--sp-5); padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--rule);
+}
+.section__head .n {
+  font-family: var(--font-mono); font-size: 11px; line-height: 1;
+  background: var(--accent-soft) var(--folk-grain) repeat; background-size: auto;
+  color: var(--ink); border: 1px solid var(--line);
+  padding: 4px 7px;
+}
+.section__head h2 { font-size: clamp(1.25rem, 1.05rem + 1vw, 1.75rem); font-weight: 700; }
+.section__head .anchor {
+  font-family: var(--font-mono); font-size: 13px; color: var(--faint);
+  text-decoration: none; opacity: 0; transition: opacity 0.12s;
+  min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  margin: -12px 0;                          /* keeps the touch target without growing the row */
+}
+.section__head:hover .anchor, .anchor:focus-visible { opacity: 1; }
+
+.lead { font-size: clamp(1.0625rem, 1rem + 0.45vw, 1.1875rem); color: var(--muted); max-width: var(--measure); margin-bottom: var(--sp-6); }
+.prose { max-width: var(--measure); margin-bottom: var(--sp-6); }
+.prose:last-child { margin-bottom: 0; }
+
+/* ==========================================================================
+   STEPS. 1 column, then 2, then 4.
+   ========================================================================== */
+.flow { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); margin-bottom: var(--sp-6); }
+.step { background: var(--paper) var(--folk-grain) repeat; background-size: auto; padding: var(--sp-4) var(--sp-5) var(--sp-5); border: 1px solid var(--line); border-top: 3px solid var(--accent); }
+.step__n {
+  display: inline-block; font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.08em; color: var(--accent-ink); font-weight: 600;
+  padding: 2px var(--sp-2) 2px 0;
+}
+.step h4 { font-size: 17.5px; font-weight: 700; margin: var(--sp-3) 0; letter-spacing: -0.018em; }
+.step dl { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: var(--sp-1) var(--sp-2); margin: 0; font-size: 13px; line-height: 1.5; }
+.step dt { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); padding-top: 3px; }
+.step dd { margin: 0; font-weight: 500; }
+
+/* ==========================================================================
+   CALLOUTS. Five levels, five shapes.
+   ========================================================================== */
+.callout { padding: var(--sp-4) var(--sp-5); margin-bottom: var(--sp-3); border: 1px solid var(--line); max-width: var(--measure); }
+.callout + :not(.callout) { margin-top: var(--sp-6); }
+.callout:last-child { margin-bottom: 0; }
+.callout__lb {
+  display: flex; align-items: center; gap: 7px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.callout p { font-size: 16px; }
+.callout--note  { background: var(--note-soft) var(--folk-grain) repeat; background-size: auto; }
+.callout--note  .callout__lb { color: var(--note-ink); }
+.callout--ok    { background: var(--ok-soft) var(--folk-grain) repeat; background-size: auto; }
+.callout--ok    .callout__lb { color: var(--ok-ink); }
+.callout--warn  { background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto; }
+.callout--warn  .callout__lb { color: var(--warn-ink); }
+.callout--no    { background: var(--no-soft) var(--folk-grain) repeat; background-size: auto; border: 1px dashed var(--no); }
+.callout--no    .callout__lb { color: var(--no-ink); }
+.callout--alarm { background: var(--alarm-fill) var(--folk-grain) repeat; background-size: auto; color: var(--alarm-on); border: 3px double var(--alarm); border-left: 6px solid var(--alarm); }
+.callout--alarm .callout__lb { color: var(--alarm-on); font-weight: 700; }
+.callout--alarm a { color: var(--alarm-on); }
+
+/* ==========================================================================
+   STATUS PILLS
+   ========================================================================== */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px var(--sp-2) 3px 7px; white-space: nowrap;
+  border: 1px solid var(--line); vertical-align: middle;
+}
+.pill--ok    { background: var(--ok-soft) var(--folk-grain) repeat; background-size: auto;    color: var(--ok-ink); }
+.pill--no    { background: var(--no-soft) var(--folk-grain) repeat; background-size: auto;    color: var(--no-ink); border: 1px dashed var(--no); }
+.pill--warn  { background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto;  color: var(--warn-ink); }
+.pill--alarm { background: var(--alarm-fill) var(--folk-grain) repeat; background-size: auto; color: var(--alarm-on); border: 3px double var(--alarm); }
+.pill--note  { background: var(--note-soft) var(--folk-grain) repeat; background-size: auto;  color: var(--note-ink); }
+.pill--na    { background: var(--sunk) var(--folk-grain) repeat; background-size: auto;       color: var(--faint); border-style: dotted; }
+
+/* ==========================================================================
+   TABLE. Mobile: each row becomes a card labelled from data-l.
+   From 720px: a real table with a strong rule under the head, hairlines,
+   alternating background. Wide tables scroll inside .table-wrap.
+   ========================================================================== */
+.table-wrap { margin-bottom: var(--sp-6); overflow-x: auto; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl caption { text-align: left; margin-bottom: var(--sp-3); }
+.tbl thead { display: none; }
+.tbl tbody, .tbl tr, .tbl td { display: block; }
+.tbl tr { background: var(--paper) var(--folk-grain) repeat; background-size: auto; padding: var(--sp-3) var(--sp-4); margin-bottom: var(--sp-2); border: 1px solid var(--line); }
+.tbl tr:nth-child(even) { background: var(--sunk) var(--folk-grain) repeat; background-size: auto; }
+.tbl td { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: var(--sp-2); padding: 3px 0; line-height: 1.5; }
+.tbl td::before {
+  content: attr(data-l);
+  font-family: var(--font-body); font-size: 13px; font-weight: 700;
+  color: var(--accent-ink);
+  padding-top: 4px;
+}
+.tbl tr.is-alarm { background: var(--alarm-soft) var(--folk-grain) repeat; background-size: auto; }
+.tbl tr.is-warn { background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto; }
+.tbl tr.is-na { color: var(--faint); }
+.tbl td.num { font-family: var(--font-mono); }
+
+/* ==========================================================================
+   LISTS: definitions, checklist, numbered steps
+   ========================================================================== */
+.defs { margin: 0 0 var(--sp-6); background: var(--paper) var(--folk-grain) repeat; background-size: auto; }
+.defs > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line-soft); }
+.defs > div:last-child { border-bottom: 0; }
+.defs dt { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); }
+.defs dd { margin: 0; color: var(--muted); font-size: 15px; }
+
+.checklist { list-style: none; margin: 0 0 var(--sp-6); padding: 0; max-width: var(--measure); }
+.checklist li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--line); font-size: 15.5px; }
+.checklist li:last-child { border-bottom: 0; }
+.checklist .y { color: var(--ok); }
+.checklist .n { color: var(--no); }
+
+.steps-ol { margin: 0 0 var(--sp-6); padding: 0; list-style: none; counter-reset: s; max-width: var(--measure); }
+.steps-ol li { counter-increment: s; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: var(--sp-3); padding: var(--sp-3) 0; border-bottom: 1px solid var(--line-soft); }
+.steps-ol li:last-child { border-bottom: 0; }
+.steps-ol li::before { content: counter(s, decimal-leading-zero); font-family: var(--font-mono); font-size: 12px; color: var(--accent); padding-top: 4px; }
+
+/* Rule quote: a rule-coloured line, no colour fill */
+.rule-q {
+  border-top: 2px solid var(--rule); padding: var(--sp-4) 0 0; margin: var(--sp-6) 0;
+  max-width: var(--measure);
+  font-size: 1.3125rem; line-height: 1.4; font-weight: 500; letter-spacing: -0.01em;
+}
+.rule-q small { display: block; margin-top: var(--sp-2); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 400; }
+
+/* Brief: key/value ledger for the summary */
+.brief { background: var(--paper) var(--folk-grain) repeat; background-size: auto; border: 1px solid var(--line); border-top: 3px solid var(--accent); max-width: var(--measure); margin-bottom: var(--sp-6); }
+.brief__row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 18px 20px; border-bottom: 1px solid var(--line-soft); font-size: 15px; align-items: baseline; }
+.brief__row:last-child { border-bottom: 0; }
+.brief__k { font-family: var(--font-body); font-size: 15px; font-weight: 700; line-height: 1.4; color: var(--accent-ink); }
+.brief__v { font-size: 17px; font-weight: 400; line-height: 1.55; }
+.brief__v .mono { font-family: var(--font-mono); font-weight: 700; }
+
+/* Timeline: horizontal from 720px, vertical on phones */
+.tl { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.tl__pt { display: flex; flex-direction: column; gap: 4px; position: relative; padding-left: var(--sp-5); }
+.tl__pt::before { content: ""; position: absolute; left: 0; top: 7px; width: 10px; height: 10px; background: var(--accent); }
+.tl__pt--warn::before { background: var(--warn-soft); border: 1px solid var(--line); }
+.tl__pt--alarm::before { background: var(--alarm-soft); border: 3px double var(--line); }
+.tl__d { font-family: var(--font-mono); font-size: 13px; color: var(--accent-ink); }
+.tl__pt--alarm .tl__d { color: var(--alarm); }
+.tl__t { font-weight: 700; font-size: 16px; }
+.tl__w { font-size: 14px; color: var(--muted); }
+
+/* Questions and answers */
+.faq { margin: 0 0 var(--sp-6); max-width: var(--measure); }
+.faq > div { padding: var(--sp-4) 0; border-bottom: 1px solid var(--line); }
+.faq > div:last-child { border-bottom: 0; }
+.faq dt { font-weight: 700; font-size: 16px; margin-bottom: var(--sp-1); }
+.faq dd { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* Missing fact: to be filled in, never invented */
+.ph { font-family: var(--font-mono); font-size: 12px; color: var(--warn-ink); background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto; padding: 1px 5px; }
+
+/* ==========================================================================
+   CODE, DIFFS, DISCLOSURES
+   ========================================================================== */
+pre {
+  font-family: var(--font-mono); font-size: 13px; line-height: 1.55;
+  background: var(--paper) var(--folk-grain) repeat; background-size: auto;
+  border: 1px solid var(--line);
+  padding: var(--sp-4) var(--sp-5); margin: 0 0 var(--sp-6);
+  overflow-x: auto; white-space: pre; tab-size: 4;
+}
+pre.diff .add  { display: inline-block; width: 100%; background: var(--ok-soft); }
+pre.diff .del  { display: inline-block; width: 100%; background: var(--no-soft); color: var(--no-ink); }
+pre.diff .hunk { display: inline-block; width: 100%; color: var(--accent-ink); font-weight: 600; }
+pre.diff .meta { display: inline-block; width: 100%; color: var(--muted); }
+
+details { border: 1px solid var(--line); margin: 0 0 var(--sp-4); max-width: none; }
+details > summary {
+  cursor: pointer; padding: var(--sp-3) var(--sp-4);
+  background: var(--paper) var(--folk-grain) repeat; background-size: auto;
+  font-weight: 600; list-style: none;
+}
+details > summary::before { content: "+ "; font-family: var(--font-mono); color: var(--accent-ink); }
+details[open] > summary::before { content: "\2013  "; }
+details > summary::-webkit-details-marker { display: none; }
+details > :not(summary) { margin-left: var(--sp-4); margin-right: var(--sp-4); }
+details > pre { margin-left: 0; margin-right: 0; border-left: 0; border-right: 0; border-bottom: 0; }
+details > :last-child:not(pre) { margin-bottom: var(--sp-4); }
+
+/* Proposal card: a titled block with a status pill in the head */
+.card { border: 1px solid var(--line); margin: 0 0 var(--sp-6); background: #fff; }
+.card__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line); background: var(--paper) var(--folk-grain) repeat; background-size: auto; }
+.card__head h3 { margin: 0; font-size: 17px; }
+.card__id { font-family: var(--font-mono); font-size: 12px; color: var(--accent-ink); }
+.card__body { padding: var(--sp-4); }
+.card__body > :last-child { margin-bottom: 0; }
+
+/* Evidence line: source, locator, excerpt */
+.ev { font-size: 14px; color: var(--muted); margin: 0 0 var(--sp-2); padding-left: var(--sp-4); border-left: 2px solid var(--line-soft); }
+.ev .loc { font-family: var(--font-mono); font-size: 12px; }
+.ev q { font-style: italic; }
+
+/* Footer */
+.doc-foot { border-top: 1px solid var(--rule); padding-top: var(--sp-5); margin-top: var(--sp-8); font-size: 14px; color: var(--muted); }
+.doc-foot .label { margin-bottom: var(--sp-2); }
+
+.to-top {
+  position: fixed; right: var(--sp-4); bottom: var(--sp-4); z-index: 40;
+  display: none; align-items: center; gap: 6px;
+  background: var(--ink); color: var(--paper); border: 0;
+  padding: var(--sp-3) var(--sp-4); min-height: 44px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.to-top.is-on { display: flex; }
+
+/* ==========================================================================
+   FROM 720px: tablet. Real table, steps in two columns.
+   ========================================================================== */
+@media (min-width: 720px) {
+  .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .tbl { background: var(--paper) var(--folk-grain) repeat; background-size: auto; }
+  .tbl thead { display: table-header-group; }
+  .tbl tbody { display: table-row-group; }
+  .tbl tr { display: table-row; padding: 0; margin: 0; background: none; border: 0; }
+  .tbl tr:nth-child(even) { background: none; }
+  .tbl th {
+    font-family: var(--font-body); font-size: 14px; font-weight: 700;
+    color: var(--accent-ink); text-align: left;
+    background: var(--accent-soft) var(--folk-grain) repeat; background-size: auto;
+    padding: 12px 16px; line-height: 1.4;
+    border-top: 1px solid var(--line); border-bottom: 2px solid var(--accent);
+  }
+  .tbl td {
+    display: table-cell; padding: 10px 16px; font-size: 14px;
+    border-bottom: 1px solid var(--line); vertical-align: middle;
+  }
+  .tbl td::before { content: none; }
+  .tbl tbody tr:nth-child(even) td { background: var(--sunk) var(--folk-grain) repeat; background-size: auto; }
+  .tbl tbody tr:last-child td { border-bottom: 0; }
+  /* Same specificity as the alternating rule, or the row loses its state colour. */
+  .tbl tbody tr.is-alarm td { background: var(--alarm-soft) var(--folk-grain) repeat; background-size: auto; }
+  .tbl tbody tr.is-warn td { background: var(--warn-soft) var(--folk-grain) repeat; background-size: auto; }
+  .tbl--num td:first-child { font-family: var(--font-mono); color: var(--accent); width: 62px; }
+
+  .brief__row { grid-template-columns: 170px minmax(0, 1fr); gap: 24px; }
+
+  .tl { grid-template-columns: repeat(4, minmax(0, 1fr)); position: relative; padding-top: var(--sp-5); }
+  .tl::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 2px; background: var(--line); }
+  .tl__pt { padding-left: 0; padding-top: var(--sp-2); }
+  .tl__pt::before { left: 0; top: -16px; }
+
+  .defs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line-soft); }
+  .defs > div {
+    grid-template-columns: 120px minmax(0, 1fr); gap: var(--sp-3);
+    align-items: baseline; background: var(--paper) var(--folk-grain) repeat; background-size: auto; border-bottom: 0;
+  }
+}
+
+/* ==========================================================================
+   FROM 1040px: desktop. Contents become a sticky side column, the bar goes,
+   steps sit in four columns.
+   ========================================================================== */
+@media (min-width: 1040px) {
+  .bar { display: none; }
+
+  .shell {
+    display: grid;
+    grid-template-columns: 212px minmax(0, 1fr);
+    gap: var(--sp-9);
+    align-items: start;
+    max-width: 1360px; margin: 0 auto;
+    padding-top: var(--sp-7);
+  }
+  .toc {
+    display: block !important;              /* the drawer does not drive the desktop */
+    position: sticky; top: var(--sp-6);
+    background: none; border-bottom: 0;
+    max-height: calc(100vh - var(--sp-10)); overflow-y: auto;
+  }
+  .toc__head { display: block; margin: 0 0 var(--sp-3) 15px; }
+  .toc__prog { display: block; height: 3px; background: var(--line); margin: 0 0 var(--sp-3) 15px; }
+  .toc__prog span { display: block; height: 100%; width: 0; background: var(--accent); }
+  .toc ol { padding: 0; }
+  .toc a { padding: var(--sp-2) 15px; min-height: 0; font-size: 14px; grid-template-columns: 26px minmax(0, 1fr); }
+
+  /* The header's left edge lines up with the content column: gutter + contents column + grid gap */
+  .doc-head__in { padding-left: calc(var(--gutter) + 212px + var(--sp-9)); }
+  .search { padding: 0; grid-column: 2; }
+  .flow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .section { scroll-margin-top: var(--sp-6); }
+}
+
+/* ==========================================================================
+   PRINT. Contents, search and bar go; colours stay legible.
+   ========================================================================== */
+@media print {
+  :root { --bg: #FFFFFF; --paper: #fff; --band: #F7F3EF; --sunk: #f7f7f4; }
+  .bar, .toc, .search, .to-top, .anchor, .skip { display: none !important; }
+  .shell { display: block; padding: 0 0 var(--sp-6); max-width: none; }
+  body { font-size: 11pt; }
+  .doc-head { padding: 0 0 var(--sp-5); border-bottom: 2px solid var(--rule); }
+  .doc-head__in { padding: 0; max-width: none; }
+  .section { break-inside: avoid-page; margin-bottom: var(--sp-6); }
+  .callout, .step, .tbl tr, .card { break-inside: avoid; }
+  .callout--alarm { border: 3px double var(--line); }
+  .flow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .prose a::after { content: " (" attr(href) ")"; font-family: var(--font-mono); font-size: 9pt; color: #555; }
+  body, .doc-head, .chip, .brief, .step, .callout, .pill, .tbl, .tbl tr,
+  .tbl td, .tbl th, .defs, .defs > div, .section__head .n, pre, details > summary, .card__head { background-image: none; }
+  details { display: block; }
+  details > :not(summary) { display: block; }
+  pre { white-space: pre-wrap; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#content">Skip to content</a>
+
+<header class="doc-head">
+ <div class="doc-head__in">
+  <div class="eyebrow">{{EYEBROW}}</div>
+  <h1>{{TITLE}}</h1>
+  <p class="sub">{{SUBTITLE}}</p>
+  <div class="chips">
+{{CHIPS}}
+  </div>
+ </div>
+</header>
+
+<div class="bar">
+  <button class="bar__btn" id="tocBtn" type="button" aria-expanded="false" aria-controls="toc">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 3h12M1 7h12M1 11h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    Contents
+  </button>
+  <div class="bar__now"><b id="barNum">00</b><span id="barName"></span></div>
+  <span class="bar__prog" id="barProg"></span>
+</div>
+
+<div class="shell">
+
+  <nav class="toc" id="toc" hidden aria-label="Contents">
+    <div class="toc__head label">Contents</div>
+    <div class="toc__prog" aria-hidden="true"><span id="tocProg"></span></div>
+    <ol>
+{{TOC}}
+    </ol>
+  </nav>
+
+  <main class="doc" id="content">
+
+    <form class="search" role="search" onsubmit="return false">
+      <div class="search__box">
+        <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.4" stroke="currentColor" stroke-width="1.4"/><path d="M9.3 9.3L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <input type="search" id="q" placeholder="Search this document" aria-label="Search this document" autocomplete="off">
+        <button class="search__clear" id="qClear" type="button" hidden>Clear</button>
+      </div>
+      <div class="search__count" id="qCount" role="status" aria-live="polite"></div>
+    </form>
+
+{{SECTIONS}}
+
+    <div class="doc-foot">
+      <div class="label">About this document</div>
+      <p>{{FOOT}}</p>
+    </div>
+
+  </main>
+</div>
+
+<button class="to-top" id="toTop" type="button">
+  <svg width="12" height="12" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 12V2M2.5 6.5L7 2l4.5 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Top
+</button>
+
+<script>
+(function () {
+  'use strict';
+
+  var DESKTOP = window.matchMedia('(min-width: 1040px)');
+  var toc     = document.getElementById('toc');
+  var tocBtn  = document.getElementById('tocBtn');
+  var links   = Array.prototype.slice.call(toc.querySelectorAll('a[href^="#"]'));
+  var secs    = links.map(function (a) { return document.getElementById(a.getAttribute('href').slice(1)); });
+
+  /* --- Contents drawer (mobile only; CSS forces it visible on desktop) --- */
+  function setDrawer(open) {
+    toc.hidden = !open;
+    tocBtn.setAttribute('aria-expanded', String(open));
+  }
+  function syncViewport() {
+    if (DESKTOP.matches) { toc.hidden = false; tocBtn.setAttribute('aria-expanded', 'false'); }
+    else { setDrawer(false); }
+  }
+  tocBtn.addEventListener('click', function () { setDrawer(toc.hidden); });
+  toc.addEventListener('click', function (e) { if (e.target.closest('a') && !DESKTOP.matches) setDrawer(false); });
+  DESKTOP.addEventListener('change', syncViewport);
+  syncViewport();
+
+  /* --- Scroll-spy: current section, progress, mobile bar --- */
+  var tocProg = document.getElementById('tocProg');
+  var barProg = document.getElementById('barProg');
+  var barNum  = document.getElementById('barNum');
+  var barName = document.getElementById('barName');
+  var toTop   = document.getElementById('toTop');
+  var queued  = false;
+
+  function top(el) { return el.getBoundingClientRect().top + window.pageYOffset; }
+
+  function sync() {
+    queued = false;
+    var probe = window.pageYOffset + 120;
+    var cur = 0, i;
+    for (i = 0; i < secs.length; i++) {
+      if (secs[i] && !secs[i].hidden && top(secs[i]) <= probe) cur = i;
+    }
+    var span = document.documentElement.scrollHeight - window.innerHeight;
+    /* The last section can be too short to reach the probe line; pin it at the very bottom. */
+    if (span > 0 && window.pageYOffset >= span - 4) cur = links.length - 1;
+
+    for (i = 0; i < links.length; i++) {
+      if (i === cur) links[i].setAttribute('aria-current', 'true');
+      else links[i].removeAttribute('aria-current');
+    }
+    var pct = span > 0 ? Math.max(0, Math.min(100, (window.pageYOffset / span) * 100)) : 0;
+    if (tocProg) tocProg.style.width = pct + '%';
+    if (barProg) barProg.style.width = pct + '%';
+
+    var active = links[cur];
+    if (active) {
+      barNum.textContent = active.querySelector('b').textContent;
+      barName.textContent = active.querySelector('span').textContent;
+    }
+    toTop.classList.toggle('is-on', window.pageYOffset > 600);
+  }
+  function onScroll() { if (!queued) { queued = true; window.requestAnimationFrame(sync); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+
+  toTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  });
+
+  /* --- Search: highlights hits, hides sections without any, opens disclosures that hold one --- */
+  var q      = document.getElementById('q');
+  var qClear = document.getElementById('qClear');
+  var qCount = document.getElementById('qCount');
+  var SKIP   = { SCRIPT: 1, STYLE: 1, MARK: 1 };
+
+  /* Remember the initial markup once; every clear returns to it, so highlights never stack. */
+  var pristine = secs.map(function (s) { return s.innerHTML; });
+
+  function reset() {
+    secs.forEach(function (s, i) { s.innerHTML = pristine[i]; s.hidden = false; });
+    links.forEach(function (a) { a.hidden = false; });
+    qCount.textContent = '';
+    qClear.hidden = true;
+  }
+
+  function highlight(root, needle) {
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        if (SKIP[n.parentNode.nodeName]) return NodeFilter.FILTER_REJECT;
+        return n.nodeValue.toLowerCase().indexOf(needle) === -1
+          ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    var found = [], n;
+    while ((n = walker.nextNode())) found.push(n);
+
+    found.forEach(function (node) {
+      var text = node.nodeValue, low = text.toLowerCase();
+      var frag = document.createDocumentFragment(), from = 0, at;
+      while ((at = low.indexOf(needle, from)) !== -1) {
+        if (at > from) frag.appendChild(document.createTextNode(text.slice(from, at)));
+        var m = document.createElement('mark');
+        m.textContent = text.slice(at, at + needle.length);
+        frag.appendChild(m);
+        from = at + needle.length;
+      }
+      if (from < text.length) frag.appendChild(document.createTextNode(text.slice(from)));
+      var d = node.parentNode;
+      node.parentNode.replaceChild(frag, node);
+      while (d && d !== root) { if (d.tagName === 'DETAILS') d.open = true; d = d.parentNode; }
+    });
+    return found.length;
+  }
+
+  function run() {
+    var needle = q.value.trim().toLowerCase();
+    reset();
+    if (needle.length < 2) return;
+
+    qClear.hidden = false;
+    var hits = 0, withHits = 0;
+    secs.forEach(function (s, i) {
+      var n = highlight(s, needle);
+      hits += n;
+      if (n === 0) { s.hidden = true; links[i].hidden = true; }
+      else { withHits++; }
+    });
+    qCount.textContent = hits === 0
+      ? 'No matches for "' + q.value.trim() + '"'
+      : hits + (hits === 1 ? ' match' : ' matches') + ' in ' + withHits + (withHits === 1 ? ' section' : ' sections');
+    sync();
+  }
+
+  var debounce;
+  q.addEventListener('input', function () {
+    clearTimeout(debounce);
+    debounce = setTimeout(run, 140);
+  });
+  qClear.addEventListener('click', function () { q.value = ''; reset(); q.focus(); sync(); });
+  q.addEventListener('keydown', function (e) { if (e.key === 'Escape') { q.value = ''; reset(); sync(); } });
+
+  /* Slash focuses the search box unless already typing in a field. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target.tagName;
+    if (t === 'INPUT' || t === 'TEXTAREA' || e.target.isContentEditable) return;
+    e.preventDefault();
+    q.focus();
+    q.select();
+  });
+
+  sync();
+})();
+</script>
+
+</body>
+</html>

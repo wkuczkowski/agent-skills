@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing for Agents"
+  short_description: "Write skills and instruction files agents follow"
+  default_prompt: "Use $writing-for-agents to write or review this skill."

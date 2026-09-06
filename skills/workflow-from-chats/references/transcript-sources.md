@@ -1,6 +1,6 @@
 # Transcript sources
 
-These layouts and fields were verified on this machine on 2026-09-05. Inspect current records before relying on them. Prefer streaming JSONL with a JSON parser; raw text search can identify candidates but cannot establish authorship. Existing Python standard-library tooling is sufficient.
+These layouts and fields were verified on this machine on 2026-09-05 and re-checked by the first full run on 2026-09-06. Inspect current records before relying on them. Prefer streaming JSONL with a JSON parser; raw text search can identify candidates but cannot establish authorship. Existing Python standard-library tooling is sufficient.
 
 Resolve the actual home/config root rather than hardcoding a username. Codex normally uses `~/.codex`, with `CODEX_HOME` as an override. Claude Code normally uses `~/.claude`; check `CLAUDE_CONFIG_DIR` when configured. Inspect only relevant configuration values, not credential files.
 
@@ -11,7 +11,7 @@ Primary transcripts:
 - `sessions/YYYY/MM/DD/rollout-*.jsonl`
 - `archived_sessions/**/*.jsonl`, searched recursively
 
-Read `session_meta.payload` first. Its `id` identifies the transcript; a subagent's `session_id` can equal its root's ID. Check `thread_source` and `source` before classifying message authorship. Observed sources include `user`, `subagent`, `guardian_review`, `voice_chat` and `agent_created_thread`. Subagent and automatic-review prompts are agent-authored. Voice or agent-created tasks need their actual human turns established rather than accepting all their content.
+Read `session_meta.payload` first. Its `id` identifies the transcript; a subagent's `session_id` can equal its root's ID. Check `thread_source` and `source` before classifying message authorship. Sources observed on this machine (2026-09-06): `cli` and `vscode` are human surfaces; `exec` is a headless run launched by an agent; `subagent` is agent-authored; `guardian_review`, `voice_chat` and `agent_created_thread` also occur upstream. Automatic-review prompts are agent-authored. In a voice (realtime) record only the `<input>` element carries the user's words; the surrounding handoff text is system text. Agent-created tasks need their actual human turns established rather than accepting all their content.
 
 Select `type=response_item`, `payload.type=message`, `payload.role=user`. For recent records, inspect `payload.internal_chat_message_metadata_passthrough.content_item_kinds`, aligned by index with `payload.content`:
 

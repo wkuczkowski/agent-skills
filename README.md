@@ -8,9 +8,23 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 ## Skills
 
+### Managing skills and instructions
+
+- **manage-skills** — lists what Claude Code or Codex sees, adds vendor skills, adopts a vendor skill through an interview, retires skills, and runs a weekly or monthly review of the whole collection (usage from transcripts, upstream changes, drift, vendor-guidance refresh).
+- **writing-for-agents** — the writing manual for skills, `AGENTS.md`/`CLAUDE.md` and pointer-reached docs, with harness mechanics for Claude Code and Codex and per-model guidance for Claude Fable 5.1 and GPT-6 Astra. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
+
+- **orchestrate** — user-invoked: run the main agent as an orchestrator that keeps its context for decisions, delegates building, testing, research and review, and hands work to the other harness when needed.
+- **choose-agent** — user-invoked: which model does which work, by harness (Opus 5, Fable 5.1, Astra) with effort levels and the Astra + Fable pairing for the hardest bugs.
+- **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
+
+### Machine hygiene
+
+- **vetting-dependencies** — before any package, image, action or installer is pulled from the network: decide whether it is worth adding at all, have a subagent check owner, releases, advisories and typosquatting, state a verdict.
+- **exposing-services** — expose a dev server or container to the LAN behind ufw and a temporary firewall rule, diagnose a service that does not answer, close the port when done.
+
 ### Workflows
 
-- **workflow-from-chats** — extract reusable skills and proposed changes from Codex and Claude Code conversations, with user evidence, fork deduplication, and a local HTML report based on the bundled Folk template.
+- **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs) in the form `manage-skills new` takes, deduplicated against the manifest, with links to the transcript turns behind each, as an HTML report on the house template.
 
 ### Agent CLIs
 

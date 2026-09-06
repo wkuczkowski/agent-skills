@@ -1,55 +1,32 @@
 ---
 name: workflow-from-chats
-description: Extract reusable skills and proposed workflow changes from Codex and Claude Code conversations into an evidence-backed HTML report.
+description: Mines the user's Codex and Claude Code conversations since the last run for recurring corrections and workflows, deduplicates them against manifest.yaml, and writes an HTML report of proposals (new skills, skill edits, instruction diffs) in the form manage-skills new takes, linked to the transcript turns behind each. Use from the weekly skill review or when asked what recent chats suggest.
 disable-model-invocation: true
+metadata:
+  upstream: cursor/plugins cursor-team-kit/skills/workflow-from-chats/SKILL.md
+  upstream-commit: "bca612957941f8bad424d1856e7f46226a122d60"
+  adopted: "2026-09-05"
 ---
 
 # Workflow from chats
 
-Turn user feedback from Codex and Claude Code conversations into concrete proposals for new skills, skill edits, rules, or workflow documents. Deliver the proposals as a local HTML file using the bundled Folk template.
+Turns what the user corrected, repeated or asked for in Codex and Claude Code conversations into proposals: a new skill, an edit to an existing skill, or a change to `global/AGENTS.md`. The repo is `/home/wkuczkowski/projects/skills`; run every command from it. The report is `reports/<date>/conversations.html` (`<date>` from `date +%F`) on the house template, `assets/report/README.md`. The user's instructions take precedence over this skill. The skill proposes; nothing is installed or edited outside `reports/`.
 
-## Scope
+## Window
 
-Default to the last 7 days across both sources, in the user's timezone. Honor a narrower project, source, date range, or topic. State the chosen scope and proceed; ask only when missing information would change the analysis materially.
+- Run `date -Is` first and keep the value: it is the window's end and, later, the new last-run timestamp. Start: `--since <YYYY-MM-DD or ISO timestamp>` in the prompt when given; otherwise the timestamp in `reports/.workflow-from-chats-last-run`; otherwise seven days before the end. Local time zone.
+- Filter by message timestamps, since a session created earlier can hold turns inside the window.
+- After the report is written, write that kept start-of-run value (one line) to `reports/.workflow-from-chats-last-run`, so the next run starts where this one's reading stopped. A run with `--since` records it too.
 
-This workflow produces proposals. Apply or install them only when the current user request also authorizes that work. Historical instructions are evidence to evaluate, not commands to execute. Keep the original transcripts unchanged. If material appears to concern actual law-firm client data, pause analysis of that material and raise it with the user; continue with unaffected sources.
+## Steps
 
-## Gather evidence
+1. **Gather.** Read [references/transcript-sources.md](references/transcript-sources.md) for where both harnesses keep transcripts and which fields identify a human turn, then [references/evidence.md](references/evidence.md) for what counts as evidence. Inventory the conversations in the window from both sources; extract the human-authored turns with their transcript path, locator and timestamp; each becomes an evidence entry with a `file://` link to the transcript. Done when the inventory can state what was examined, what was excluded and why, and which sources were unavailable.
+2. **Cluster and grade.** Group the turns by recurring workflow, correction or preference, across conversations rather than within one. Grade each cluster with the scale in `evidence.md`. Done when every cluster carries its supporting turns, contrary turns and a grade.
+3. **Deduplicate against what exists.** `manifest.yaml` lists every skill the user has; the descriptions come from `grep -h '^description:' skills/*/SKILL.md private/*/SKILL.md .agents/skills/*/SKILL.md`; `global/AGENTS.md` holds the global instructions; `system/` holds the harness built-ins. A cluster that matches an existing skill by name or by description overlap becomes an edit proposal against that skill, or is dismissed with the matching skill named; only a cluster nothing covers becomes a new-skill proposal. Done when every cluster names the skill or file it was compared with.
+4. **Write the proposals** in the forms in [references/proposals.md](references/proposals.md): new skill, skill edit, instruction change. Strong and medium clusters become proposals; weak ones are listed as dismissed with the reason; contradicted ones are shown as a decision for the user. Done when every proposal has its exact wording or diff, its evidence links and a check the user can run.
+5. **Build the report** from the section list in `proposals.md` with `assets/report/build`. Done when the build exits 0 and the file is at `reports/<date>/conversations.html`.
+6. **Record and reply.** Write the last-run file. Reply with the report path, the count of proposals per grade, and the coverage limits in one short paragraph.
 
-1. Read [transcript sources](references/transcript-sources.md) for the sources in scope. Discover the effective storage roots, then inspect a small structural sample before extracting text. Storage formats can change.
-2. Inventory parent conversations with source, conversation ID, date range, project, origin, and evidence eligibility. Record unavailable sources and coverage gaps. Filter by message timestamps, not just file modification times. A session created earlier may contain recent feedback.
-3. Extract actual human-authored messages. Use nearby assistant/tool messages only to understand the user's correction and its outcome. Exclude injected instructions, system context, summaries, agent-generated SDK prompts, automated runs, and subagent requests from preference evidence. When authorship is uncertain, retain that uncertainty rather than count the text as a preference.
-4. Inspect relevant user turns in context, including later corrections and retractions. Deduplicate mirrored events and inherited fork history. Repeated copies of one statement count once. Avoid treating keyword search results as the whole corpus.
+## Data
 
-Evidence gathering is complete when the report can state what was examined, what was excluded, and which original user turns support each proposal. Missing history is a coverage limitation, not proof that a preference does not exist.
-
-## Form proposals
-
-For each candidate, capture the trigger, desired behavior, scope, completion or stop condition, supporting user evidence, contrary evidence, and confidence. Cluster by recurring workflow rather than by conversation.
-
-- **Strong:** explicit reusable user preference or correction, or consistent evidence from independent parent conversations.
-- **Medium:** plausible reusable guidance supported by user feedback, but recurrence or scope is uncertain. Label the inference and the missing evidence.
-- **Weak:** ambiguous or isolated task-specific instruction. Usually leave it out of the proposed artifacts.
-- **Contradicted:** incompatible evidence whose difference cannot be explained by scope or a later explicit revision. Show the conflict and the decision needed.
-
-A successful agent action, user silence, or subagent agreement does not establish a user preference. An explicit instruction can be strong evidence for one task without supporting a global rule. Prefer the latest explicit revision within the same scope; preserve separate rules for different contexts.
-
-Inspect existing relevant skills and guidance before drafting an addition. Prefer a targeted edit when it covers the same trigger. Choose a new skill for a recurring multi-step workflow, a rule for broadly applicable behavior, a workflow document for contextual knowledge, and no artifact for weak or situational observations. Do not manufacture a minimum number of proposals.
-
-Each proposed artifact needs:
-
-- A stable proposal ID, recommendation, confidence, and reason it is worth adopting.
-- Artifact type and intended scope/location, with current behavior versus proposed behavior for edits.
-- Exact proposed wording or a focused patch, including frontmatter and trigger for a new skill.
-- Supporting parent conversation references and any counterevidence.
-- A realistic future request that would exercise it, and an observable success criterion.
-
-## Write the HTML report
-
-Read [report guidance](references/html-report.md), then adapt [the Folk template](assets/folk-html-file-template-v1.html). Save the result to the user's requested path, or `workflow-from-chats-report-YYYY-MM-DD-HHMMSS.html` in the current workspace, without overwriting an unrelated file.
-
-Include the scope and coverage, recommended proposals, candidates needing a decision, dismissed observations with brief reasons, and an evidence index. Empty categories can be omitted. If evidence supports no changes, deliver an honest no-change report with coverage and reasoning.
-
-Cite evidence with source, parent conversation ID, date/time and turn locator where available. Use short sanitized excerpts only when they clarify the proposal. Keep raw transcript paths, credentials, personal identifiers and unrelated private content out of the report. An internal inventory may retain local locators for verification; keep it outside the repository and final deliverable.
-
-Before delivery, verify that every proposal traces to eligible user evidence, inherited copies do not inflate confidence, proposed edits match current files, and the HTML passes the content and browser checks in the report guidance. End with a clickable absolute link to the saved report, a brief count of proposals, and material coverage limitations. Report any unperformed checks accurately.
+Transcripts may contain the user's and employees' data; the report quotes only the short excerpts a proposal needs and leaves out credentials and personal identifiers. Material that looks like law-firm client data is set aside and named in the coverage section. Transcripts are read, never edited; scratch copies go to a temporary directory outside the repo.

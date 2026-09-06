@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vetting Dependencies"
+  short_description: "Check a package before it is installed"
+  default_prompt: "Use $vetting-dependencies before adding this package."
