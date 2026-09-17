@@ -43,5 +43,5 @@ Close the interview with a short summary of the decisions and wait for the user'
 
    The `upstream` line is exactly `owner/repo path/to/SKILL.md@<commit>`; `bin/upstream` parses this form and reports `unknown` for anything else. Add `harnesses:` only when the user narrowed them.
 5. In the repo: `bin/unvendor <name>`. This deletes `.agents/skills/<name>` and the lock entry and nothing else. `npx skills remove` is off limits here: it also deletes `skills/<name>` when that directory exists.
-6. `bin/link`, then `bin/link check`. Expect the `unslop` finding only. Confirm `bin/upstream` lists the skill as `own`, `unchanged`.
+6. `bin/link`, then `bin/link check`. Expect 0 findings. Confirm `bin/upstream` lists the skill as `own`, `unchanged`.
 7. Tell the user what changed: files written, manifest diff, lock entry removed, projections relinked.
