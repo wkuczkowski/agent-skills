@@ -9,7 +9,7 @@ The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the re
 
 ## Conventions
 
-- `manifest.yaml` is the source of truth for what exists and which harness sees it; `bin/link` projects it onto `~/.claude/skills` and `~/.agents/skills`. After any change to the manifest, `skills/`, `private/` or `.agents/skills/`, run `bin/link` and then `bin/link check`. One known finding is expected: `unslop` invocation differs (vendor file, report only).
+- `manifest.yaml` is the source of truth for what exists and which harness sees it; `bin/link` projects it onto `~/.claude/skills` and `~/.agents/skills`. After any change to the manifest, `skills/`, `private/` or `.agents/skills/`, run `bin/link` and then `bin/link check`. A clean check reports 0 findings; `~/.claude/skills/synced` (the desktop app's account skills) is exempt.
 - Vendor skills under `.agents/skills/` stay verbatim; `npx skills` owns them. Changing one means adopting it.
 - Own skills default to both harnesses and model invocation. A user-only own skill needs both `disable-model-invocation: true` in the frontmatter and `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; the frontmatter is the truth and `bin/link check` reports mismatches.
 - Retiring a skill, deleting files and changing skill content happen only after the user has said so. Reviews propose; they do not apply.

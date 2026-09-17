@@ -10,7 +10,7 @@ Run from the repo. `D=reports/$(date +%F)`; `mkdir -p "$D"`.
 
 1. `bin/usage --write > "$D/usage.txt"`, then `bin/usage --unused > "$D/unused.txt"`.
 2. `bin/upstream --json > "$D/upstream.json"` (exit 1 means at least one skill changed; that is a result, not an error). For each record with `status: changed`: `bin/upstream --diff <name> > "$D/upstream-<name>.diff"` and read the diff.
-3. `bin/link check > "$D/check.txt"` (exit 1 whenever there are findings; the `unslop` finding is the known baseline).
+3. `bin/link check > "$D/check.txt"` (exit 1 whenever there are findings; a clean check reports 0).
 4. Candidates from conversations: when `"$D/conversations.html"` does not exist yet, read `skills/workflow-from-chats/SKILL.md` and carry out that skill with its default window (since its last run). It is user-only, so it is followed by reading the file, not through the Skill tool. Its report lands at `"$D/conversations.html"`; when the file already exists from today, use it as it is.
 5. Consistency: read together everything an agent loads together and note each contradiction in `"$D/consistency.txt"` (file and line for both sides, the kind, the proposed resolution). Weekly scope: every own skill under `skills/` and `private/`, `global/AGENTS.md` and the repo's `AGENTS.md`, since these change often. Monthly scope: also every vendor skill a harness sees (`bin/link list claude-code`, `bin/link list codex`). A contradiction is one of four kinds: two skills claiming the same trigger (compare descriptions first, then bodies); a skill contradicting a rule in the global instructions; one rule stated twice with different wording; a reference to a path, flag or command that no longer exists (confirm with `ls`, `--help` or the harness). Done when every file in scope has been read in this run and each finding carries both quotes.
 6. Write the sections fragment `"$D/review-sections.html"` as specified below, then build:
@@ -29,7 +29,7 @@ Run from the repo. `D=reports/$(date +%F)`; `mkdir -p "$D"`.
 
 Section ids in order: `summary`, `usage`, `unused`, `conversations`, `upstream`, `drift`, `consistency`, `proposals`; monthly adds `research` and `compliance` before `proposals`. Text from files and diffs goes through `data-src` or is escaped.
 
-**summary.** A `brief` ledger: kind (weekly or monthly), usage window, `usage.yaml` generation time, unused candidates (count), conversation proposals (count per grade), upstream changes (count), drift findings (new ones, apart from `unslop`), consistency findings (count), and the list of files this run wrote.
+**summary.** A `brief` ledger: kind (weekly or monthly), usage window, `usage.yaml` generation time, unused candidates (count), conversation proposals (count per grade), upstream changes (count), drift findings (count), consistency findings (count), and the list of files this run wrote.
 
 **usage.** A `tbl` with the columns of `usage.txt`: skill, harness, invocations, last invoked, sessions; one row per skill and harness, all of them, zero rows included, numbers in `class="num"` cells. Below it a second table for the `not in manifest` block, when present, with its `class` column (`claude-code built-in`, `codex system`, `project skill`, `retired`, `unknown`) and `where`, followed by the one-line note from `usage.txt` that built-ins and system skills stay live in their harness whatever the repo says.
 
@@ -39,7 +39,7 @@ Section ids in order: `summary`, `usage`, `unused`, `conversations`, `upstream`,
 
 **upstream.** One entry per skill in `upstream.json` whose status is `changed`: skill, upstream, files modified, added, removed, a summary of the diff in two or three sentences that says what changed in substance (a new section, a reworded rule, a fixed command) and whether it touches the branches the user reaches, and the diff itself folded in `details` with `<pre class="diff" data-src="upstream-<name>.diff">`. A vendor skill whose `local_drift` is true has been edited in place; report that as a finding. Then a list of `unknown` records with their reason, and the one-line repo summary from `repos`. When nothing changed: `none` and the `unchanged` count.
 
-**drift.** `<pre class="code" data-src="check.txt">`, then a sentence separating the known finding (`unslop`) from anything new.
+**drift.** `<pre class="code" data-src="check.txt">`, then a sentence on each finding, or `none`.
 
 **consistency.** The scope this run read (own skills and both instruction files weekly; vendor skills as well monthly), then one entry per finding from `consistency.txt`: the kind (same trigger, against a global rule, restated rule, dead reference) and a two-column `tbl` with the two conflicting quotes side by side, each headed by its file and line, followed by a proposed resolution in a sentence or two: which wording wins and where the other goes, or which reference to fix. A vendor skill is not edited; there the resolution is a manifest narrowing, an adoption or a line in the own skill or instruction file. When nothing conflicts: `none` and the count of files read.
 
