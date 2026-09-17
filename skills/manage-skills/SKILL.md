@@ -5,7 +5,7 @@ description: Manages the user's skill collection in the agent-skills repo. Lists
 
 # Manage skills
 
-The collection lives in `/home/wkuczkowski/projects/skills` (below: the repo). Run every `bin/*` and `npx skills` command with the repo as the working directory, whatever directory the session started in. The repo's `AGENTS.md` holds the rules and `CONTEXT.md` the vocabulary; read them once per session before changing anything. The user's instructions take precedence over this skill.
+The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the repo). Run every `bin/*` and `npx skills` command with the repo as the working directory, whatever directory the session started in. The repo's `AGENTS.md` holds the rules and `CONTEXT.md` the vocabulary; read them once per session before changing anything. The user's instructions take precedence over this skill.
 
 ## Conventions
 

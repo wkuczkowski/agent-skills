@@ -1,0 +1,6 @@
+interface:
+  display_name: "Conversion UX"
+  short_description: "Design paywalls, pricing, checkout and signup screens"
+  default_prompt: "Use $conversion-ux to design this conversion-critical screen."
+policy:
+  allow_implicit_invocation: false

@@ -8,7 +8,7 @@ Contents: [Context pointers](#context-pointers), [The two loads](#the-two-loads)
 
 A context pointer is a line that sits in the agent's context, names material that does not, and encodes the condition for reaching it. A skill's description is one. A sentence in `AGENTS.md` naming a doc is the same object. A link in a skill body to a file under `references/` is a third.
 
-The wording of the pointer, not the quality of its target, decides whether and when the target is reached. A must-read file behind a vague pointer is a variance bug. Sharpen the wording first; inline the material only when sharpening fails.
+The pointer's wording usually decides whether and when the target is reached, more often than the target's quality does. A must-read file behind a vague pointer is a variance bug. Sharpen the wording first; inline the material only when sharpening fails.
 
 A pointer does two jobs: it says what the material is, and it lists the branches that should trigger opening it. A branch is a distinct case the document handles, so that different runs take different paths. Pointers that are always loaded cost on every turn, so they are pruned harder than any body:
 
@@ -62,15 +62,15 @@ By invocation: split off a model-invocable skill when a distinct leading word sh
 
 ## Leading words
 
-A leading word is a compact concept the model already holds from pretraining and thinks with while running the document: lesson, fog of war, tracer bullet, tight, red. Repeated as a token, never as a sentence, it accumulates a distributed definition and anchors a whole region of behaviour in the fewest tokens by recruiting priors the model has already. A coined word works if it is defined clearly, but recruits no priors: the definition costs what a pretrained word gives free. Reach for an existing word first.
+A leading word is a compact concept the model already holds from pretraining and thinks with while running the document: lesson, fog of war, tracer bullet, tight, red. Repeated as a token, never as a sentence, it accumulates a distributed definition and anchors a whole region of behaviour in the fewest tokens by recruiting priors the model has already. A coined word works if it is defined clearly, but recruits no priors: the definition costs what a pretrained word gives free. Reach for an existing word first. A leading word replaces a repeated triad, not a single load-bearing constraint; where the substitution would trade a literal phrase for a metaphor, keep the literal phrase, since Anthropic's Fable 5.1 guidance names that trade as mannered prose.
 
 It anchors twice. In the body it anchors execution: the agent reaches for the same behaviour each time the word appears, and inside flat reference it focuses attention on a class of thing to look for. In a pointer it anchors invocation: when the same word lives in prompts, docs and codebase, the agent links that shared language to the material and reaches it more reliably.
 
-Hunt for refactors. A triad spelled out at three sites, a pointer spending a sentence to gesture at one idea: each collapses into a token. "Fast, deterministic, low-overhead" becomes tight. "A loop you believe in" becomes red, turning a fuzzy gate into a binary observable state. The win is double: fewer tokens, and a sharper hook for the agent's thinking. Assume every document carries restatements a leading word would retire.
+Hunt for refactors. A triad spelled out at three sites, a pointer spending a sentence to gesture at one idea: each collapses into a token. "Fast, deterministic, low-overhead" becomes tight. "A loop you believe in" becomes red, turning a fuzzy gate into a binary observable state. The win is double: fewer tokens, and a sharper hook for the agent's thinking. Many documents carry restatements a leading word would retire; look for them, and leave the document alone when there are none.
 
 ## Negation
 
-Steering by prohibition drags the forbidden behaviour into context and makes it more available, not less. The negation is a weak modifier on a strongly activated concept, so a ban half-reads as an instruction to do the thing. Write the positive: state the target behaviour ("write one-line comments") so the banned one is never spoken. A prohibition earns its place only as a hard guardrail that cannot be phrased positively, and even then it sits next to the positive target so attention lands on what to do.
+Prefer the positive: state the target behaviour ("write one-line comments") so the banned one is never spoken, and put a prohibition next to its positive form so attention lands on what to do. A prohibition works on its own where the failure has a name, since a defined anti-pattern with an example is what both vendors use when a default needs correcting, and where a wrong guess costs data, security, a destructive action or a decision the user made.
 
 ## Pruning
 
@@ -80,7 +80,7 @@ The environment is a source of truth too: `package.json` scripts, config files, 
 
 Relevance: does the line still bear on what the document does? A line loses relevance by never bearing on the task (exposition, or a branch that should be disclosed) or by going stale as the behaviour or the world changes. Shorter documents are easier to keep relevant. Without a pruning discipline the default fate is sediment: stale layers that settle because adding feels safe and removing feels risky, until someone has to core down through them to find what is still live.
 
-No-ops: an instruction the model already obeys by default pays load to say nothing. The test is model-relative, not reader-relative: two people disagreeing about a no-op disagree about the default, and settle it by running the document, not by debate. When a sentence fails the test, delete the whole sentence rather than trim words from it. The test also grades leading words: a word too weak to beat the default ("be thorough" for a model that is already thorough) is a no-op, and the fix is a stronger word, not a different technique. Both current models have raised the bar: what once needed stating is now the default, and stating it again over-triggers. See `models.md`.
+No-ops: an instruction the model already obeys by default pays load to say nothing. The test is model-relative, not reader-relative: two people disagreeing about a no-op disagree about the default, and settle it by running the document, not by debate. When a sentence fails the test, delete the whole sentence rather than trim words from it. Sentences covering data, security, a destructive action or a decision the user made are reported, not deleted. The test also grades leading words: a word too weak to beat the default ("be thorough" for a model that is already thorough) is a no-op, and the fix is a stronger word, not a different technique. Both current models have raised the bar: what once needed stating is now the default, and stating it again over-triggers. See `models.md`.
 
 ## Invocation as a trade
 

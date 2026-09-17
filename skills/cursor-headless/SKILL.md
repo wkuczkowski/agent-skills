@@ -1,6 +1,6 @@
 ---
 name: cursor-headless
-description: Use when you need the Grok model available through Cursor and are working outside the Cursor harness. Runs Cursor Agent headlessly with Grok 4.6 High Fast.
+description: Use when you need the Grok model available through Cursor and are working outside the Cursor harness. Runs Cursor Agent headlessly with Grok 4.6 High, in normal or Fast mode depending on the task.
 ---
 
 # Cursor headless (`cursor-agent -p`)
@@ -13,14 +13,15 @@ Use this for a one-shot task:
 
 ```bash
 cursor-agent -p --trust --auto-review --sandbox disabled \
-  --model cursor-grok-4.6-high-fast \
-  "<task>" --output-format stream-json >events.jsonl 2>err.log
+  --workspace "$PWD" --model cursor-grok-4.6-high \
+  "<task>" --output-format stream-json \
+  < /dev/null >events.jsonl 2>err.log
 ```
 
 - `--trust` is mandatory in headless mode.
 - Always pass `--auto-review --sandbox disabled` and the model explicitly.
-- Use `--workspace <path>` to set the working root.
-- For resumable, long-running, or multitask work, read [sessions, multitasking, and monitoring](references/sessions-multitasking-monitoring.md).
+- `--workspace <path>` sets the working root. It does not isolate files: the session reads and writes any absolute path on disk. Keep secrets and answer keys off reachable paths, and name allowed paths in the task.
+- For resumable, long-running, multitask, or mass-parallel work, read [sessions, multitasking, and monitoring](references/sessions-multitasking-monitoring.md).
 - For MCP, read [MCP servers](references/mcp.md) before constructing the command.
 
 Cursor writes client state under `~/.cursor/projects`. If a parent sandbox blocks startup, allow the outer process to write there. Keep Cursor's own Auto Review setting and task scope unchanged.
@@ -30,7 +31,7 @@ If the CLI itself fails, hangs, selects the wrong model, emits malformed output,
 ## Output and completion
 
 - Prefer `stream-json` for automation. A successful stream starts with `system/init` and ends with a `result` event whose `.subtype` is `success` and `.is_error` is `false`.
-- Confirm `system/init.model` is `Cursor Grok 4.6 High Fast`.
+- Confirm `system/init.model` matches the slug you selected, Fast or not.
 - With `--output-format json`, `.result` can concatenate text from several assistant turns. Do not treat it as an exact final-message field.
 - Extract the last assistant text from a completed stream when exact output matters:
 
@@ -39,14 +40,15 @@ If the CLI itself fails, hangs, selects the wrong model, emits malformed output,
            | select(.type=="text") | .text] | last' events.jsonl
   ```
 
+- When the task asks for a result file and the file is missing, extract JSON from the last `result` event or from that last assistant text. The model may emit the JSON in the reply with no tool calls.
 - `system/init.permissionMode` may report `default` even when the command explicitly passes `--auto-review`. The explicit flag and captured command are the review-mode record.
 - Keep stderr separate from stdout. A non-zero exit or an error result means failure.
-- Piped stdin is appended to the prompt argument.
+- Piped stdin is appended to the prompt argument. Redirect stdin from `/dev/null` unless the prompt is the pipe.
 - Cursor has no structured-output schema flag. Ask for JSON when needed, but validate it in the caller.
 
 ## Model
 
-Always use `cursor-grok-4.6-high-fast`. The slug selects Cursor Grok 4.6 with high reasoning and Fast serving. Keep it for every task unless the user explicitly requests another model.
+Two slugs, same model and effort: `cursor-grok-4.6-high` (normal) and `cursor-grok-4.6-high-fast` (Fast, quicker output). Pick per run. Fast fits when a quicker answer helps: you or the user are waiting on the result, the run is one step in an interactive loop, or it is a smoke check. Normal fits background and batch work where nobody is blocked on the answer. The user's choice of mode takes precedence.
 
 `cursor-agent models` lists valid slugs for the account. The `system/init` event confirms the resolved display name.
 

@@ -6,9 +6,19 @@ disable-model-invocation: true
 
 # Choose agent
 
-Which model does which work depends on the harness the main agent runs in: the Agent tool and the `claude` binary mean Claude Code, `codex` and `$skill` syntax mean Codex. Read the table for that harness. The user's explicit choice overrides the table. When unsure between two rows, pick the cheaper option and say why. Cheap and fast lookups (a fact, a package check, a version) go to Astra at low effort in either harness.
+Which model does which work depends on the harness the main agent runs in. Identify it from the current session and exposed tools, not from installed CLI binaries. Read the table for that harness. The user's explicit choice overrides the table. When unsure between two rows, pick the cheaper option and say why. Cheap and fast lookups (a fact, a package check, a version) go to Astra at low effort in either harness.
 
-Model ids: `claude-fable-5-1`, `claude-opus-5`, `gpt-6-astra`. Fable and Opus run through the Agent tool (`model: fable|opus`), a workflow or `claude-headless` (`--model fable|opus --effort high`); Astra runs through `codex-headless` (`-m gpt-6-astra -c model_reasoning_effort=low|high`).
+Model ids: `claude-fable-5-1`, `claude-opus-5`, `gpt-6-astra`.
+
+## Execution route
+
+Always use the current harness's native mechanism for a model it supports. Work directly when the current agent is the selected model; when delegating, use the native subagent or workflow mechanism exposed in this session and its supported model and effort parameters.
+
+- In Codex, run Astra natively; never launch `codex-headless` or `codex exec` to obtain Astra.
+- In Claude Code, run Fable and Opus natively through the Agent tool (`model: fable|opus`) or a native workflow; never launch `claude-headless` or `claude -p` to obtain them.
+- Use headless for a model outside the current harness: normally `claude-headless` for Fable or Opus from Codex, and `codex-headless` for Astra from Claude Code. Read the corresponding skill for invocation details.
+
+The only exception to the native rule is a deliberate test of the headless CLI, skill loading or integration itself. State what the headless run is testing. An ordinary task that includes writing or running tests is not this exception. If the required native mechanism is unavailable, report that limitation instead of silently falling back to headless for the same harness.
 
 ## Main agent in Claude Code
 

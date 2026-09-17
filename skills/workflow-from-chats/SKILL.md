@@ -10,7 +10,7 @@ metadata:
 
 # Workflow from chats
 
-Turns what the user corrected, repeated or asked for in Codex and Claude Code conversations into proposals: a new skill, an edit to an existing skill, or a change to `global/AGENTS.md`. The repo is `/home/wkuczkowski/projects/skills`; run every command from it. The report is `reports/<date>/conversations.html` (`<date>` from `date +%F`) on the house template, `assets/report/README.md`. The user's instructions take precedence over this skill. The skill proposes; nothing is installed or edited outside `reports/`.
+Turns what the user corrected, repeated or asked for in Codex and Claude Code conversations into proposals: a new skill, an edit to an existing skill, or a change to `global/AGENTS.md`. The repo is `/home/wkuczkowski/projects/TOOLS/skills`; run every command from it. The report is `reports/<date>/conversations.html` (`<date>` from `date +%F`) on the house template, `assets/report/README.md`. The user's instructions take precedence over this skill. The skill proposes; nothing is installed or edited outside `reports/`.
 
 ## Window
 

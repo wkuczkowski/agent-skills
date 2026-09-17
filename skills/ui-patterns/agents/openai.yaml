@@ -1,0 +1,6 @@
+interface:
+  display_name: "UI Patterns"
+  short_description: "Pick the right pattern for search, empty states, inputs"
+  default_prompt: "Use $ui-patterns to choose the interface pattern for this surface."
+policy:
+  allow_implicit_invocation: false

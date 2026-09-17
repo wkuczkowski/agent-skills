@@ -1,0 +1,6 @@
+interface:
+  display_name: "UX Critique"
+  short_description: "Audit a screen or flow for usability and dark patterns"
+  default_prompt: "Use $ux-critique to critique this screen or flow."
+policy:
+  allow_implicit_invocation: false

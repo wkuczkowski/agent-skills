@@ -2,6 +2,7 @@
 name: ux-critique
 description: Audits an existing screen, page, flow or component for usability, conversion and deceptive-pattern problems, and proposes concrete pasteable rewrites. Use when asked to review or critique a design, screenshot, landing page, checkout, paywall or signup flow, to say why something is not converting, or to check an interface for dark patterns and accessibility defects.
 license: Apache-2.0
+disable-model-invocation: true
 ---
 
 # UX critique

@@ -1,6 +1,6 @@
 interface:
   display_name: "Orchestrate"
   short_description: "Run the main agent as an orchestrator of delegates"
-  default_prompt: "Use $orchestrate for this task and propose the scale of parallel work first."
+  default_prompt: "Use $orchestrate for this task."
 policy:
   allow_implicit_invocation: false

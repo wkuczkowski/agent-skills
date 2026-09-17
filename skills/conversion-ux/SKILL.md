@@ -2,6 +2,7 @@
 name: conversion-ux
 description: Designs and improves conversion-critical screens — paywalls, free trials, pricing pages, product pages, carts, checkout, signup, onboarding and upgrade prompts — using evidence-graded behavioral levers, Baymard/NN-g findings, and the legal bright lines on deceptive patterns. Use when building or changing any screen where a user decides to pay, subscribe, book, sign up, or add to cart, or when a flow "looks fine" but does not convert.
 license: Apache-2.0
+disable-model-invocation: true
 ---
 
 # Conversion UX

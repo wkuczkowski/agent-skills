@@ -94,7 +94,7 @@ Claude Code, through the `claude-headless` skill with session persistence left o
 
 Codex, through the `codex-headless` skill with `codex exec --json ... </dev/null` (an open stdin stalls it): the rollout `~/.codex/sessions/<yyyy>/<mm>/<dd>/rollout-*.jsonl` carries the `<skills_instructions>` block in the first developer message for loading, and a command reading the skill's `SKILL.md` for invocation.
 
-A skill listed but not invoked on its trigger has a pointer problem: rewrite the description before touching the body.
+A skill listed but not invoked on its trigger is usually a pointer problem: check the description first, and the descriptions it competes with, before touching the body.
 
 ## Repo standard
 

@@ -2,6 +2,7 @@
 name: ui-patterns
 description: Chooses and builds the right interface pattern for search and autocomplete, empty and no-results states, category and browse screens, numeric and choice inputs, progressive disclosure, tooltips, personalization and recommendations, and order-tracking or post-purchase screens. Use when designing or reviewing any of those surfaces, deciding between two controls, or when a screen works but feels effortful, blank, or noisy.
 license: Apache-2.0
+disable-model-invocation: true
 ---
 
 # UI patterns
