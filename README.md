@@ -13,7 +13,7 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 - **manage-skills** — lists what Claude Code or Codex sees, adds vendor skills, adopts a vendor skill through an interview, retires skills, and runs a weekly or monthly review of the whole collection (usage from transcripts, upstream changes, drift, vendor-guidance refresh).
 - **writing-for-agents** — the writing manual for skills, `AGENTS.md`/`CLAUDE.md` and pointer-reached docs, with harness mechanics for Claude Code and Codex and per-model guidance for Claude Fable 5.1 and GPT-6 Astra. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
 
-- **orchestrate** — user-invoked: run the main agent as an orchestrator that keeps its context for decisions, delegates building, testing, research and review, and hands work to the other harness when needed.
+- **orchestrate** — user-invoked: run the main agent as an orchestrator that protects its own context and delegates reading, building, testing, research and the review of delivered work to subagents.
 - **choose-agent** — user-invoked: which model does which work, by harness (Opus 5, Fable 5.1, Astra) with effort levels and the Astra + Fable pairing for the hardest bugs.
 - **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
 
@@ -30,13 +30,13 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 - **claude-headless** — run Claude Code programmatically via the headless CLI (`claude -p`): output parsing, session resume, permissions, structured output, verified gotchas.
 - **codex-headless** — run OpenAI Codex CLI programmatically via `codex exec`: gpt-\*-sol model + reasoning-effort selection, workspace-write sandbox, "Approve for me" auto-review, JSONL/schema output, session resume.
-- **cursor-headless** — run Cursor Agent CLI programmatically via `cursor-agent -p`.
+- **cursor-headless** — run Cursor Agent CLI programmatically via `cursor-agent -p`, in normal or Fast mode depending on the task.
 
 ### Design
 
-- **conversion-ux** — design paywalls, pricing, checkout, product pages and signup flows: evidence-graded behavioral levers, Baymard/NN-g findings, and the legal bright lines on deceptive patterns.
-- **ui-patterns** — pick the right pattern for search, empty states, browse screens, numeric input, disclosure, personalization and post-purchase.
-- **ux-critique** — audit an existing screen for usability, conversion and dark-pattern defects: two-stage find-then-filter, evidence contract per finding, hard exclusions.
+- **conversion-ux** — user-invoked: design paywalls, pricing, checkout, product pages and signup flows: evidence-graded behavioral levers, Baymard/NN-g findings, and the legal bright lines on deceptive patterns.
+- **ui-patterns** — user-invoked: pick the right pattern for search, empty states, browse screens, numeric input, disclosure, personalization and post-purchase.
+- **ux-critique** — user-invoked: audit an existing screen for usability, conversion and dark-pattern defects: two-stage find-then-filter, evidence contract per finding, hard exclusions.
 
 ## Provenance
 
