@@ -62,7 +62,7 @@ Skills and instruction files are written in English.
 
 This applies to a new skill, or one whose description or body changed materially. A small edit that leaves the description and the routing untouched needs items 1 and 2. The user may waive any item.
 
-1. `claude plugin validate skills/<name>` reports no findings.
+1. `claude plugin validate --strict skills` passes; for a private skill, run it on a scratch `skills/` holding a copy. It accepts only a directory named `skills` (anything else fails with "No manifest found") and ignores `name` and unknown fields, so check the frontmatter against the rules above by hand.
 2. `manifest.yaml` has the entry (`kind: own`; for adoptions also `adopted: true` and `upstream: <owner/repo> <path>/SKILL.md@<sha>`), `bin/link` has run, and `bin/link check` is clean apart from known findings.
 3. One headless run per harness (skills `claude-headless` and `codex-headless`) with a prompt matching the description shows the skill listed and invoked. Evidence is the harness record (Claude Code: the `skill_listing` attachment and a Skill tool call in the session transcript; Codex: `<skills_instructions>` in the rollout and a read of `SKILL.md`), never the model's self-report.
 4. It agrees with what loads beside it: read the descriptions of the skills sharing its triggers (`bin/link list <harness>`) and the global instructions (`global/AGENTS.md`), and settle every overlap or contradiction in one of the two places; every path, flag and command it names exists.
