@@ -8,7 +8,7 @@ Keep the calling tool attached to a supervised process and retain its handle whe
 
 ```bash
 # Run in the intended repository. Prepare a private run_dir and prompt.txt first.
-claude -p \
+CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p \
   --model fable --effort medium \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --output-format stream-json --verbose \
@@ -19,6 +19,10 @@ if wait "$claude_pid"; then run_exit=0; else run_exit=$?; fi
 printf '%s\n' "$run_exit" > "$run_dir/exit-code"
 exit "$run_exit"
 ```
+
+## A silent kill of background tasks
+
+Print mode waits a ceiling of 600 s for background tasks once the main agent ends its turn, then terminates them and exits `0` with `subtype: success, terminal_reason: completed`. The only trace is a stderr line: `Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.` This hits orchestrations where the main agent spawns subagents with the Agent tool and ends its turn while they run (observed 2026-09-18 on 2.1.274: 28 min run, five subagents killed, result record clean). `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS` is absent from the [official variable reference](https://code.claude.com/docs/en/env-vars) as of 2.1.274; it is undocumented but observed working. Set it to `0` for any run expected to background work, and grep stderr for `Background tasks still running` before reporting completion.
 
 The outer execution tool must allow the intended task duration. Its yield interval is not necessarily a kill timeout. Track outer task deadlines separately from Claude Bash-tool timeouts. `--max-turns` and `--max-budget-usd` do not establish a wall-clock deadline; check supported flags in the installed CLI before using them.
 
@@ -33,6 +37,12 @@ Before declaring a run dead, establish what process namespace the observation se
 ## Resume only after termination is confirmed
 
 Use an explicit recorded Claude session ID with `--resume`. `--continue` selects the latest conversation in the working directory and can select another task. Retain the selected model and permission flags unless the user changes them; choose medium or high for the follow-up using the complexity rule in SKILL.md; use new output files for each turn. `--no-session-persistence` prevents resumption. If persistence was disabled or no usable session exists, start a fresh conversation only after confirming exit, with a checkpoint of verified files and remaining work.
+
+After a background-task kill, resume the same session with the ceiling lifted and a short technical message stating what happened: the process ended, the ceiling that caused it, which subagents were killed. The agent keeps its context and re-reaches its subagents with SendMessage; do not re-specify the task.
+
+```bash
+CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p --resume "$session_id" ...
+```
 
 Never start a second writer merely because monitoring is uncertain. Confirm the old writer has exited; if authorized to stop it, identify that exact process, stop it, wait for exit, and check its owned test children before resuming. Avoid broad process-name kills. If several orchestrators can launch work, use a shared ownership record or lock.
 

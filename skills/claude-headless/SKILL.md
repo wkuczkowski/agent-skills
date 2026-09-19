@@ -34,7 +34,7 @@ Run from the intended repository using the calling tool's working-directory para
 
 ## Report run status and task acceptance separately
 
-1. **Run completed:** retain the actual process exit code and parse the terminal `result` object. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit.
+1. **Run completed:** retain the actual process exit code and parse the terminal `result` object. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit. The terminal record does not cover background work: print mode kills background tasks 600 s after the main agent ends its turn and still reports success. Launch any run that may spawn subagents with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`, and grep stderr for `Background tasks still running`; a hit means killed subagents, so report the run as interrupted and resume it ([sessions and monitoring](references/sessions-and-monitoring.md)).
 2. **Task accepted:** inspect the deliverable and verify the required behavior against the actual changed files. A clean Claude result is not a code review or proof of user-facing correctness.
 
 A failed or interrupted run can leave useful, acceptable work. Report that run as failed/interrupted and accept its saved artifact only after independent verification. Resolve writer liveness before another agent edits the same files.
@@ -48,6 +48,8 @@ CLI startup errors may produce no JSON. In-run errors can still produce a result
 Keep `--permission-mode auto --permission-prompts none`. Inherit existing sandbox settings; do not alter global or project configuration merely to get a run through. For read-only work, state that scope and restrict available tools when useful while retaining Auto.
 
 Use `--strict-mcp-config` when no MCP server is needed. It excludes account and repository MCP configuration, not hooks, plugins, or all other customization. `--tools` selects available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary. Resolve blocked actions within existing controls; do not switch to permission bypass.
+
+A directory never opened interactively, typically a fresh git worktree, is untrusted: stderr says `Ignoring N permissions.allow entries from .claude/settings.json: this workspace has not been trusted`, and the project allowlist is dropped (Auto still passes the calls, hooks still run). Open the directory interactively once, or set `projects[<path>].hasTrustDialogAccepted` in `~/.claude.json`.
 
 Use the data access already authorized by the user. Ask only when a new boundary actually needs approval, not again for the same approved scope. Keep credentials out of prompts, result excerpts, and reports. Account privacy/retention terms depend on the service and settings; verify them when relevant rather than assuming all Claude launches use one account type.
 
