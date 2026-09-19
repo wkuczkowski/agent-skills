@@ -5,24 +5,26 @@ description: Use when you need the Grok model available through Cursor and are w
 
 # Cursor headless (`cursor-agent -p`)
 
-Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.02-c22c1a3`.
+Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.18-9a7762b`.
 
 ## Choose a run
 
 Use this for a one-shot task:
 
 ```bash
-cursor-agent -p --trust --auto-review --sandbox disabled \
+timeout -k 15 1800 cursor-agent -p --trust --auto-review --sandbox disabled \
   --workspace "$PWD" --model cursor-grok-4.6-high \
-  "<task>" --output-format stream-json \
-  < /dev/null >events.jsonl 2>err.log
+  --output-format stream-json < prompt.txt >events.jsonl 2>err.log
 ```
 
 - `--trust` is mandatory in headless mode.
 - Always pass `--auto-review --sandbox disabled` and the model explicitly.
+- Pass the prompt on stdin from a file. One argv string is capped at 128 KiB, so a long brief passed as an argument fails. With no prompt argument, stdin is the whole prompt; with one, piped stdin is appended to it, so redirect stdin from `/dev/null` then.
+- Bound every run with `timeout -k 15 <seconds>`. Exit 124 means the timeout fired: no `result` event follows, and the stream may end before `system/init`, so the session id can be lost.
 - `--workspace <path>` sets the working root. It does not isolate files: the session reads and writes any absolute path on disk. Keep secrets and answer keys off reachable paths, and name allowed paths in the task.
-- For resumable, long-running, multitask, or mass-parallel work, read [sessions, multitasking, and monitoring](references/sessions-multitasking-monitoring.md).
+- For resumable, long-running, multitask, or mass-parallel work, or runs launched by a Claude Code orchestrator, read [sessions, multitasking, and monitoring](references/sessions-multitasking-monitoring.md).
 - For MCP, read [MCP servers](references/mcp.md) before constructing the command.
+- Cursor runs hooks in headless mode. Before adding one, or when a `hooks.json` exists in the workspace, read [hooks](references/hooks.md).
 
 Cursor writes client state under `~/.cursor/projects`. If a parent sandbox blocks startup, allow the outer process to write there. Keep Cursor's own Auto Review setting and task scope unchanged.
 
@@ -43,7 +45,6 @@ If the CLI itself fails, hangs, selects the wrong model, emits malformed output,
 - When the task asks for a result file and the file is missing, extract JSON from the last `result` event or from that last assistant text. The model may emit the JSON in the reply with no tool calls.
 - `system/init.permissionMode` may report `default` even when the command explicitly passes `--auto-review`. The explicit flag and captured command are the review-mode record.
 - Keep stderr separate from stdout. A non-zero exit or an error result means failure.
-- Piped stdin is appended to the prompt argument. Redirect stdin from `/dev/null` unless the prompt is the pipe.
 - Cursor has no structured-output schema flag. Ask for JSON when needed, but validate it in the caller.
 
 ## Model
