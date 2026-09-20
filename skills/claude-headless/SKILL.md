@@ -5,7 +5,7 @@ description: Use when you need Anthropic's Fable model and are working outside t
 
 # Claude Code headless
 
-Use `claude -p` for bounded delegated work. Default to `--model fable --effort medium`, unless the user specifies another model or effort. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.261.
+Use `claude -p` for bounded delegated work. Default to `--model fable --effort medium`, unless the user specifies another model or effort. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.278; the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
 
 ## Choose reasoning effort
 
@@ -23,18 +23,33 @@ Choose between medium and high for each task or follow-up based on its actual co
 A one-shot request:
 
 ```bash
-claude -p "<bounded task>" \
+timeout -s INT -k 30 3600 claude -p \
   --model fable --effort medium \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --no-session-persistence \
-  --output-format json >out.json 2>err.log
+  --output-format json < prompt.txt >out.json 2>err.log
 ```
 
-Run from the intended repository using the calling tool's working-directory parameter. Store prompts and logs in a private per-run directory. For longer prompts, use a file as stdin rather than interpolating its contents into shell code. Piped stdin is appended to the prompt and has a 10 MB limit; pass paths for larger inputs.
+Run from the intended repository using the calling tool's working-directory parameter. Store prompts and logs in a private per-run directory. Pass the prompt as a file on stdin rather than interpolating it into shell code. Piped stdin is appended to any prompt argument and has a 10 MB limit; pass paths for larger inputs. Web search works in this mode without extra configuration.
+
+## Time
+
+A killed run loses its in-flight tool calls, so arrange for the run to end on its own.
+
+- The `timeout` is a guard against a hung process, not a schedule. Measured on Opus at low effort: web lookup under 1 minute, bounded repository research 2–5 minutes, a task with subagents 10 minutes and more; Fable at medium or high takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
+- Send SIGINT, not the default SIGTERM (`timeout -s INT -k 30`). SIGINT ends the turn and writes a `result` with `subtype: error_during_execution` and `terminal_reason: aborted_streaming`; SIGTERM exits 143 and records nothing.
+- When a deadline exists, put it in the prompt rather than in the `timeout`. This wording made the agent finish early with a normal result and a list of gaps:
+
+  > Time budget: 10 minutes of wall-clock time from your first action. Run `date +%s` first and again after every few tool calls. When 8 minutes have passed, stop exploring and deliver the report with what you have, listing the areas you did not reach under a heading "Not covered".
+
+  The agent errs early (a 4-minute budget ended after 2 minutes), so state the budget you can really afford.
+- For work expected to pass ten minutes, ask for a progress file: findings appended to an absolute path after each area, and the final report in a second file.
+- Judge a hang by silence, not by elapsed time. A healthy stream pauses up to about 90 seconds. Ten minutes without growth in the events file is a hang: interrupt it and resume.
+- If a persisted run dies anyway, resume it ([sessions and monitoring](references/sessions-and-monitoring.md)). The task text, every completed tool result, and the subagents' saved transcripts survive, even when the kill came seconds after launch.
 
 ## Report run status and task acceptance separately
 
-1. **Run completed:** retain the actual process exit code and parse the terminal `result` object. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit. The terminal record does not cover background work: print mode kills background tasks 600 s after the main agent ends its turn and still reports success. Launch any run that may spawn subagents with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`, and grep stderr for `Background tasks still running`; a hit means killed subagents, so report the run as interrupted and resume it ([sessions and monitoring](references/sessions-and-monitoring.md)).
+1. **Run completed:** retain the actual process exit code and parse the terminal `result` object, which is the last `result` line after the process has exited. A stream can hold an earlier `result` with `subtype: success` whose text says subagents are still running; the main turn ended and the process is waiting on them, so that line is not completion. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit. The terminal record does not cover background work: print mode kills background tasks 600 s after the main agent ends its turn and still reports success. Launch any run that may spawn subagents with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`, and grep stderr for `Background tasks still running`; a hit means killed subagents, so report the run as interrupted and resume it ([sessions and monitoring](references/sessions-and-monitoring.md)).
 2. **Task accepted:** inspect the deliverable and verify the required behavior against the actual changed files. A clean Claude result is not a code review or proof of user-facing correctness.
 
 A failed or interrupted run can leave useful, acceptable work. Report that run as failed/interrupted and accept its saved artifact only after independent verification. Resolve writer liveness before another agent edits the same files.
