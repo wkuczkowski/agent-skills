@@ -24,6 +24,7 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 ### Workflows
 
+- **research** — investigate a question against primary sources, delegating the reading to one or several subagents, and write verified findings into the repo for other agents to use. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
 - **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs) in the form `manage-skills new` takes, deduplicated against the manifest, with links to the transcript turns behind each, as an HTML report on the house template.
 
 ### Agent CLIs
