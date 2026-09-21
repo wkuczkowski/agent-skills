@@ -57,6 +57,20 @@ API contracts, SDK usage, models, limits, and worked examples.
 | Write API code | [HTTP API](https://docs.typesafe.ai/api.md), [Python SDK](https://docs.typesafe.ai/sdk/python.md), or [JavaScript SDK](https://docs.typesafe.ai/sdk/javascript.md) |
 | Update an older integration | [Migration guide](https://docs.typesafe.ai/migrating-to-v1.md) and the installed SDK's current reference |
 
+## Local handbook
+
+A local supplement lives in `references/jev-agent-handbook/`: 54 developed use cases
+in 9 areas, decision design, architecture patterns, an integration map, evaluation
+and operational controls, and design templates. It carries durable reasoning and
+original examples; the live docs above remain the contract for APIs, models, and
+limits. Enter through [its index](references/jev-agent-handbook/index.md) and read
+only the route that matches the task. Do not load the whole package.
+
+Reach for it when the task is to explore what Jev could do in an application,
+decide whether Jev fits at all, design a multi-question workflow, or diagnose
+unexpected results. Skip it for a concrete, well-specified integration where the
+live SDK page and closest cookbook already answer the question.
+
 ## Find the useful shape
 
 Start from the behavior the user wants: what will the application show, select,

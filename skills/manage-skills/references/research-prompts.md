@@ -5,7 +5,7 @@ Three prompts for the monthly research refresh. Each is derived from the questio
 Common preamble, prepended to each prompt:
 
 ```
-You are refreshing a research note for the repo at /home/wkuczkowski/projects/skills.
+You are refreshing a research note for the repo at /home/wkuczkowski/projects/TOOLS/skills.
 Read <previous file> first; it answers the questions below as of <since>. Your job is to
 report what changed since <since>: new facts, corrected facts, removed features, new
 versions. Confirm every claim against a primary source (official docs, source code,
