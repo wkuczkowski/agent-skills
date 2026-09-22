@@ -11,8 +11,10 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 ### Managing skills and instructions
 
 - **manage-skills** — lists what Claude Code or Codex sees, adds vendor skills, adopts a vendor skill through an interview, retires skills, and runs a weekly or monthly review of the whole collection (usage from transcripts, upstream changes, drift, vendor-guidance refresh).
-- **writing-for-agents** — the writing manual for skills, `AGENTS.md`/`CLAUDE.md` and pointer-reached docs, with harness mechanics for Claude Code and Codex and per-model guidance for Claude Fable 5.1 and GPT-6 Astra. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
+- **writing-for-agents** — the mechanics of a finished skill or instruction file: layout, frontmatter, invocation flags, what Claude Code and Codex load, how a skill is proven to fire. The register itself lives in the global instructions.
 
+- **diagnosing-bugs** — holds a diagnosis at reproducing and locating the failure before code changes. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills) and thinned to that one correction.
+- **codebase-design** — deep modules, seams, testing through the interface: the vocabulary other skills use and the user's design preferences. Adopted from mattpocock/skills.
 - **orchestrate** — user-invoked: run the main agent as an orchestrator that protects its own context and delegates reading, building, testing, research and the review of delivered work to subagents.
 - **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
 
