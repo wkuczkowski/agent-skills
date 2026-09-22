@@ -14,7 +14,6 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 - **writing-for-agents** — the writing manual for skills, `AGENTS.md`/`CLAUDE.md` and pointer-reached docs, with harness mechanics for Claude Code and Codex and per-model guidance for Claude Fable 5.1 and GPT-6 Astra. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 - **orchestrate** — user-invoked: run the main agent as an orchestrator that protects its own context and delegates reading, building, testing, research and the review of delivered work to subagents.
-- **choose-agent** — user-invoked: which model does which work, by harness (Opus 5, Fable 5.1, Astra) with effort levels and the Astra + Fable pairing for the hardest bugs.
 - **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
 
 ### Machine hygiene

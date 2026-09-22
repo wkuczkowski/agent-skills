@@ -23,7 +23,7 @@ Close the interview with a short summary of the decisions and wait for the user'
 
 ## Writing the own skill
 
-1. Read the `writing-for-agents` skill (`~/.agents/skills/writing-for-agents/SKILL.md` and its `SKILL-MECHANICS.md`) and write `skills/<name>/SKILL.md` in its terms: description in third person with the trigger cases the user confirmed, short body, substantial reference under `references/`. Reuse the vendor skill's ideas; write the sentences yourself. Keep `scripts/` and `assets/` the user asked to keep, copied as files.
+1. Write `skills/<name>/SKILL.md` in the register of `global/AGENTS.md` and with the mechanics in the `writing-for-agents` skill: description in third person with the trigger cases the user confirmed, short body, substantial reference under `references/`. Reuse the vendor skill's ideas; write the sentences yourself. Keep `scripts/` and `assets/` the user asked to keep, copied as files.
 2. Invocation: model-invocable needs nothing. User-only needs `disable-model-invocation: true` in the frontmatter and `agents/openai.yaml` with `policy.allow_implicit_invocation: false`. Add an `interface` block (`display_name`, `short_description`, `default_prompt` mentioning `$<name>`) in either case.
 3. Find the commit to pin. From `skills-lock.json` take `source` (owner/repo) and `skillPath`; the skill directory is the parent of `skillPath`. Then:
 

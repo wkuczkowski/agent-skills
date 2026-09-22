@@ -30,6 +30,6 @@ Codex skill authoring (section 2.2, the bundled `skill-creator`). Assume Codex i
 
 ## Both
 
-- The no-op test in `theory.md` has a higher bar on both models: instructions that were needed against laziness or under-triggering on older models now over-trigger. Where a line's necessity is in doubt, run the document without it before keeping it. Lines covering data, security, a destructive action or a decision the user made are kept without the test.
+- The no-op test (would removing the line cause a mistake in a session?) has a higher bar on both models: instructions that were needed against laziness or under-triggering on older models now over-trigger. Where a line's necessity is in doubt, run the document without it before keeping it. Lines covering data, security, a destructive action or a decision the user made are kept without the test.
 - Both reward an explicit completion criterion and an explicit scope, for opposite reasons: Fable 5.1 may stop early or drift wide, Astra may stop to ask or test too much.
 - Neither needs to be told to be thorough, to think step by step, or to verify in general; the exception is Fable 5.1 at low effort, where the verification nudge for lookups above still helps. A stronger leading word replaces a weak one; a default behaviour is left unsaid.

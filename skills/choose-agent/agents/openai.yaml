@@ -1,6 +1,0 @@
-interface:
-  display_name: "Choose Agent"
-  short_description: "Which model does which work in this harness"
-  default_prompt: "Use $choose-agent to pick the model for this piece of work."
-policy:
-  allow_implicit_invocation: false

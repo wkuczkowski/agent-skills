@@ -1,0 +1,4 @@
+interface:
+  display_name: "Diagnosing Bugs"
+  short_description: "Reproduce and locate a bug before fixing"
+  default_prompt: "Use $diagnosing-bugs to reproduce and locate the failure I describe before changing any code."
