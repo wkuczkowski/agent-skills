@@ -10,7 +10,7 @@ Keep the calling tool attached to a supervised process and retain its handle whe
 # Run in the intended repository. Prepare a private run_dir and prompt.txt first.
 session_id=$(cat /proc/sys/kernel/random/uuid); printf '%s\n' "$session_id" > "$run_dir/session-id"
 CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 timeout -s INT -k 30 3600 claude -p \
-  --model fable --effort medium --session-id "$session_id" \
+  --model <model> --effort <effort> --session-id "$session_id" \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --output-format stream-json --verbose \
   < "$run_dir/prompt.txt" > "$run_dir/events.jsonl" 2> "$run_dir/stderr.log" &

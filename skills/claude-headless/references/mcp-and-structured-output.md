@@ -8,7 +8,7 @@ Pass only the required configuration:
 
 ```bash
 claude -p "<task using MCP>" \
-  --model fable --effort medium \
+  --model <model> --effort <effort> \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --mcp-config /absolute/path/mcp.json \
   --output-format json
@@ -23,7 +23,7 @@ claude -p "<task using MCP>" \
 
 ```bash
 claude -p "Extract function names from auth.py" \
-  --model fable --effort medium \
+  --model <model> --effort <effort> \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --no-session-persistence --output-format json \
   --json-schema '{"type":"object","properties":{"functions":{"type":"array","items":{"type":"string"}}},"required":["functions"]}' \

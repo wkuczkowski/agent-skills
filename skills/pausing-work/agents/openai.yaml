@@ -1,0 +1,6 @@
+interface:
+  display_name: "Pausing work"
+  short_description: "Stop running work safely and leave a handoff"
+  default_prompt: "Use $pausing-work to stop the running work safely and leave a handoff."
+policy:
+  allow_implicit_invocation: false

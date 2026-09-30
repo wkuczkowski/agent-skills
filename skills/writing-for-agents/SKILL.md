@@ -28,7 +28,7 @@ The register is the one in the global instructions (`global/AGENTS.md`, sections
 
 ## Global and project instructions
 
-- Claude Code reads `CLAUDE.md`, Codex reads `AGENTS.md` from the repo root down to the working directory, 32 KiB combined. A symlink from one name to the other gives both harnesses the same file; Claude Code's `@AGENTS.md` import works for Claude Code only, and Codex reads it as literal text.
+- Codex reads `AGENTS.md` from the repo root down to the working directory, 32 KiB combined. Claude Code 2.1.285 reads `CLAUDE.md` and, by default (`instructionFiles: claude-md-or-agents-md`), loads a directory's `AGENTS.md` where that directory has no `CLAUDE.md`; so one `AGENTS.md` and no `CLAUDE.md` serves both harnesses, which is what the user settled on 2026-09-22. Claude Code's `@AGENTS.md` import works for Claude Code only, and Codex reads it as literal text.
 - `@imports` load every session, so they organise and save nothing.
 - Instruction files are advisory. A rule that must hold with zero exceptions is a hook.
 

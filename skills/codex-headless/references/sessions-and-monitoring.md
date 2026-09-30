@@ -7,11 +7,11 @@ Choose `low` or `high` using the model and effort guidance in `SKILL.md`. The ex
 ## Resume
 
 ```bash
-codex exec resume -m gpt-6-astra -c model_reasoning_effort=high \
+codex exec resume -m <model> -c model_reasoning_effort=<effort> \
   -c approval_policy=on-request -c approvals_reviewer=auto_review \
   --last "follow-up question"
 
-codex exec resume -m gpt-6-astra -c model_reasoning_effort=high \
+codex exec resume -m <model> -c model_reasoning_effort=<effort> \
   -c approval_policy=on-request -c approvals_reviewer=auto_review \
   <SESSION_ID> "follow-up"
 ```
@@ -25,7 +25,7 @@ Do not use `--ephemeral` for a session that must be resumed. Get its id from the
 ## Background runs
 
 ```bash
-nohup timeout -k 15 3600 codex exec --json -m gpt-6-astra -c model_reasoning_effort=high \
+nohup timeout -k 15 3600 codex exec --json -m <model> -c model_reasoning_effort=<effort> \
   --sandbox workspace-write -c approval_policy=on-request -c approvals_reviewer=auto_review \
   < prompt.txt >events.jsonl 2>progress.log &
 ```

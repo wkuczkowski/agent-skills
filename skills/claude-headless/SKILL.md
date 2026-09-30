@@ -1,17 +1,17 @@
 ---
 name: claude-headless
-description: Use when you need Anthropic's Fable model and are working outside the Claude Code harness. Runs Claude Code headlessly
+description: Use when you need an Anthropic model and are working outside the Claude Code harness. Runs Claude Code headlessly with the model and reasoning effort the task calls for.
 ---
 
 # Claude Code headless
 
-Use `claude -p` for bounded delegated work. Default to `--model fable --effort medium`, unless the user specifies another model or effort. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.278; the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
+Use `claude -p` for bounded delegated work. The user names the model and effort in the chat; pass both explicitly on every run. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.278; the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
 
 ## Choose reasoning effort
 
 Use `medium` for most tasks, including design/UI changes, styling, routine implementation, focused fixes, research, and ordinary reviews. Reserve `high` for the hardest tasks: difficult architectural trade-offs, elusive concurrency bugs, or changes with complex interacting constraints that require deep reasoning. Task length or file count alone does not justify high.
 
-Choose between medium and high for each task or follow-up based on its actual complexity. A routine design correction after a high-effort architecture task should use medium. Honor an explicit user choice. The examples below use the default medium; replace it with high only when the task warrants it.
+Choose between medium and high for each task or follow-up based on its actual complexity. A routine design correction after a high-effort architecture task should use medium. Honor an explicit user choice.
 
 ## Choose the workflow
 
@@ -24,7 +24,7 @@ A one-shot request:
 
 ```bash
 timeout -s INT -k 30 3600 claude -p \
-  --model fable --effort medium \
+  --model <model> --effort <effort> \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --no-session-persistence \
   --output-format json < prompt.txt >out.json 2>err.log
@@ -36,7 +36,7 @@ Run from the intended repository using the calling tool's working-directory para
 
 A killed run loses its in-flight tool calls, so arrange for the run to end on its own.
 
-- The `timeout` is a guard against a hung process, not a schedule. Measured on Opus at low effort: web lookup under 1 minute, bounded repository research 2–5 minutes, a task with subagents 10 minutes and more; Fable at medium or high takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
+- The `timeout` is a guard against a hung process, not a schedule. Measured on Opus at low effort: web lookup under 1 minute, bounded repository research 2–5 minutes, a task with subagents 10 minutes and more; higher effort takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
 - Send SIGINT, not the default SIGTERM (`timeout -s INT -k 30`). SIGINT ends the turn and writes a `result` with `subtype: error_during_execution` and `terminal_reason: aborted_streaming`; SIGTERM exits 143 and records nothing.
 - When a deadline exists, put it in the prompt rather than in the `timeout`. This wording made the agent finish early with a normal result and a list of gaps:
 
@@ -54,7 +54,7 @@ A killed run loses its in-flight tool calls, so arrange for the run to end on it
 
 A failed or interrupted run can leave useful, acceptable work. Report that run as failed/interrupted and accept its saved artifact only after independent verification. Resolve writer liveness before another agent edits the same files.
 
-Read final text from `.result`, structured data from `.structured_output` when requested. `.session_id` is the conversation ID, not the calling tool's process/session handle. `.modelUsage` may contain Fable for the task and Haiku for Auto classification; that alone is not a model switch. Check the task model against the user's selection.
+Read final text from `.result`, structured data from `.structured_output` when requested. `.session_id` is the conversation ID, not the calling tool's process/session handle. `.modelUsage` may contain the task model and Haiku for Auto classification; that alone is not a model switch. Check the task model against the user's selection.
 
 CLI startup errors may produce no JSON. In-run errors can still produce a result, even one with `subtype: success`. Keep stdout and stderr separate, and do not pipe away the process exit status before checking it.
 

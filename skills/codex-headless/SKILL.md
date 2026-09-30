@@ -1,11 +1,11 @@
 ---
 name: codex-headless
-description: Use when you need OpenAI's Astra model and are working outside the Codex harness. Runs Codex CLI headlessly with Low or High reasoning effort chosen for the task.
+description: Use when you need an OpenAI model and are working outside the Codex harness. Runs Codex CLI headlessly with the model and reasoning effort the task calls for.
 ---
 
 # Codex headless (`codex exec`)
 
-Drive OpenAI Codex CLI non-interactively. These instructions target `codex-cli 0.155.1`; the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
+Drive OpenAI Codex CLI non-interactively. These instructions target `codex-cli 0.155.1` (0.159.2 installed on 2026-09-30); the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
 
 ## Auto-review invariant
 
@@ -23,7 +23,7 @@ Use this for a one-shot task:
 
 ```bash
 timeout -k 15 3600 codex exec --ephemeral --json --skip-git-repo-check \
-  -m gpt-6-astra -c model_reasoning_effort=low \
+  -m <model> -c model_reasoning_effort=<effort> \
   --sandbox workspace-write \
   -c approval_policy=on-request -c approvals_reviewer=auto_review \
   < prompt.txt >events.jsonl 2>progress.log
@@ -44,7 +44,7 @@ If the CLI itself fails, hangs, selects an unavailable model, emits malformed ou
 
 A killed run loses its in-flight commands and all subagent work, so arrange for the run to end on its own.
 
-- The `timeout` is a guard against a hung process, not a schedule. Measured on GPT-5.6 Sol at low effort: web research 2 minutes, bounded repository research 3–5 minutes, a task with subagents 5 minutes and more; Astra at high effort takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
+- The `timeout` is a guard against a hung process, not a schedule. Measured on GPT-5.6 Sol at low effort: web research 2 minutes, bounded repository research 3–5 minutes, a task with subagents 5 minutes and more; higher effort takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
 - When a deadline exists, put it in the prompt rather than in the `timeout`. This wording made the agent finish early with a normal `turn.completed` and a list of gaps:
 
   > Time budget: 10 minutes of wall-clock time from your first action. Run `date +%s` first and again after every few tool calls. When 8 minutes have passed, stop exploring and deliver the report with what you have, listing the areas you did not reach under a heading "Not covered".
@@ -72,12 +72,11 @@ A killed run loses its in-flight commands and all subagent work, so arrange for 
 
 ## Model and effort
 
-Use OpenAI Astra (`gpt-6-astra`) with either `low` or `high` reasoning effort. Choose by the depth of reasoning required, ambiguity, and interacting constraints, rather than task length or file count.
+The user names the model and effort in the chat; without that, `~/.codex/config.toml` holds the default. Pass `-m` and `-c model_reasoning_effort=` explicitly on every invocation, including resumed sessions, since JSONL does not show which model ran. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request (0.157.0 rejected `gpt-6.1-sol` for ChatGPT accounts, 0.159.2 accepts it).
 
-- **Astra Low:** well-defined tasks with a clear approach, such as routine edits, straightforward fixes, focused lookups, and implementation from an established plan.
-- **Astra High:** tasks requiring substantial judgment or reasoning across several steps, such as ambiguous requirements, architecture tradeoffs, difficult debugging, security analysis, and changes with complex interactions.
+## Clean runs
 
-Pass `-m gpt-6-astra` and `-c model_reasoning_effort=low` or `high` explicitly on every invocation, including resumed sessions. Reassess effort when the task changes; choose `high` when unresolved uncertainty could materially affect correctness. Use another model or effort level only when the user requests it.
+Every run sees the user's skills from `~/.agents/skills` and `CODEX_HOME/skills` and the project's `AGENTS.md`. For an experiment or test agent that must not, a per-run `CODEX_HOME` with `project_doc_max_bytes = 0`, memories off, and a `[[skills.config]] path = "...", enabled = false` entry per `SKILL.md` gave a prompt with no skill listing and no AGENTS.md (observed on `0.159.2`, 2026-09-30).
 
 ## Sandbox and approvals
 

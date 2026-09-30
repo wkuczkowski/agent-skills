@@ -69,7 +69,7 @@ Claude Code (`research/claude-code-skills-and-fable-2026-09-06.md`, section 2.2)
 
 - Load order: managed policy, `~/.claude/CLAUDE.md`, `./CLAUDE.md` or `./.claude/CLAUDE.md`, `./CLAUDE.local.md`, plus `.claude/rules/*.md` (optionally `paths:`-scoped) and auto memory. Delivered as a user message after the system prompt. Target under 200 lines per file; longer files reduce adherence.
 - `@path` imports resolve relative to the importing file, recurse four levels, and load at launch; they organise and save nothing. Wrap `@name` in backticks to mention without importing.
-- Claude Code reads `CLAUDE.md`, not `AGENTS.md`. A `CLAUDE.md` whose content is `@AGENTS.md` bridges the two; this repo does exactly that.
+- Claude Code 2.1.285 loads `AGENTS.md` wherever a directory has no `CLAUDE.md` (default `instructionFiles: claude-md-or-agents-md`; `claude-md` turns it off, `claude-md-and-agents-md` loads both). A `CLAUDE.md` whose content is `@AGENTS.md` is no longer needed as a bridge. Checked with `strings` on the installed binary, 2026-09-30.
 - Keep: commands the model cannot guess, style rules that differ from defaults, testing and repository etiquette, gotchas, rationale. Cut: anything derivable from the code, standard language conventions, long tutorials, file-by-file descriptions. A multi-step procedure or a topic that matters only sometimes moves to a skill or a path-scoped rule. If one instruction keeps being skipped, emphasise that line alone.
 - Instructions are advisory. Enforcement with zero exceptions is a `PreToolUse` hook.
 

@@ -16,6 +16,7 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 - **diagnosing-bugs** — holds a diagnosis at reproducing and locating the failure before code changes. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills) and thinned to that one correction.
 - **codebase-design** — deep modules, seams, testing through the interface: the vocabulary other skills use and the user's design preferences. Adopted from mattpocock/skills.
 - **orchestrate** — user-invoked: run the main agent as an orchestrator that protects its own context and delegates reading, building, testing, research and the review of delivered work to subagents.
+- **pausing-work** — user-invoked: bring running work to a safe stop within the time given, stop background tasks, and leave a handoff file (and a new-session prompt when asked).
 - **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
 
 ### Machine hygiene
@@ -26,12 +27,12 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 ### Workflows
 
 - **research** — investigate a question against primary sources, delegating the reading to one or several subagents, and write verified findings into the repo for other agents to use. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
-- **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs) in the form `manage-skills new` takes, deduplicated against the manifest, with links to the transcript turns behind each, as an HTML report on the house template.
+- **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs) in the form `manage-skills new` takes, deduplicated against the manifest, answered in the chat, with the evidence and ready diffs in a working file for the agent that applies them.
 
 ### Agent CLIs
 
 - **claude-headless** — run Claude Code programmatically via the headless CLI (`claude -p`): output parsing, session resume, permissions, structured output, verified gotchas.
-- **codex-headless** — run OpenAI Codex CLI programmatically via `codex exec`: gpt-\*-sol model + reasoning-effort selection, workspace-write sandbox, "Approve for me" auto-review, JSONL/schema output, session resume.
+- **codex-headless** — run OpenAI Codex CLI programmatically via `codex exec`: model and reasoning effort passed explicitly, workspace-write sandbox, "Approve for me" auto-review, JSONL/schema output, session resume.
 - **cursor-headless** — run Cursor Agent CLI programmatically via `cursor-agent -p`, in normal or Fast mode depending on the task.
 
 ### Design

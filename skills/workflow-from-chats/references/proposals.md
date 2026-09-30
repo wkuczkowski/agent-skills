@@ -1,32 +1,25 @@
-# Proposals and the report
+# Proposals: the reply and the working file
 
-`reports/<date>/conversations.html`, built with `assets/report/build` from a sections fragment (components and build options: `assets/report/README.md`). Header: title `Conversations <date>`, eyebrow `workflow-from-chats`, chips for the window start and end, the sources examined, and the proposal count. Sections in this order; a section with nothing in it says `none` and why, and stays.
+## The chat reply
 
-## Sections
+What the user reads and answers. Short enough to take in at once, numbered so he can answer "P-02 yes, P-04 no".
 
-1. `summary`: a `brief` ledger with the window, the number of conversations examined per harness, the number of human turns kept, and the proposals per grade; then the proposals as a list of links.
-2. `coverage`: what was examined (per harness: transcript roots, conversation count, turn count), what was excluded (automated runs, subagent threads, uncertain authorship, set-aside material) with counts, and which sources were unavailable or malformed.
-3. `proposals`: one card per strong or medium proposal, in the forms below.
-4. `decisions`: contradicted clusters, both sides quoted, the decision the user has to make.
-5. `dismissed`: weak clusters and clusters covered by an existing skill: one line each with the reason or the covering skill.
-6. `evidence`: the index of cited turns, one entry per turn, in the evidence-link form from `evidence.md`, with an `id` each proposal refers to.
-7. `method`: window, last-run file value read, commands used, checks performed and checks not performed.
+- One opening line: the window, conversations and human turns examined per harness.
+- One entry per strong or medium proposal, most useful first: id (`P-01`, ...), kind (new skill, skill edit, instruction change) and target, then one or two plain sentences on what would change and why, with the evidence as a count and one short quote when a quote makes the point.
+- Contradicted clusters as questions for him, both sides in one sentence each.
+- Dismissed clusters in one line, only the ones he might expect to see.
+- One coverage line: what was excluded or unavailable, and whether client data was set aside.
+- Last line: the path of the working file.
 
-## Proposal forms
+No diffs, no tables of evidence, no transcript paths in the reply.
 
-Every card carries a stable id (`P-01`, ...), a title, a grade pill, one sentence on why it is worth adopting, the evidence ids for and against, a realistic future request that would exercise it, and the observable result that shows it works. The remaining content depends on the kind.
+## The working file
 
-**New skill.** Everything `manage-skills new` needs, so the user can hand the card over unchanged:
+`reports/<date>/conversations.md`, for agents. Sections: window and coverage (per harness: roots, conversations, turns kept; exclusions with counts; unavailable or malformed sources), proposals, decisions, dismissed, evidence.
 
-- `name`: lowercase letters, digits and hyphens, equal to the directory.
-- `description`: third person, what it does then when it applies, key use case first, one trigger per branch, under 400 characters, no angle brackets.
-- invocation: `model-invocable` or `user-only`, with the reason (user-only when only the user should start it, typically a workflow with side effects).
-- harnesses: `both`, `claude-code` or `codex`, with the reason when narrowed.
-- `short_description` for `agents/openai.yaml`: 25 to 64 characters.
-- draft `SKILL.md` in a `details` block: frontmatter plus a body that states the steps, each ending on a checkable criterion, with branch material named for `references/`.
+Per proposal: id, title, grade, kind, the evidence ids for and against, and the change itself:
 
-**Skill edit.** The skill's name and path, current behaviour versus proposed behaviour in one sentence each, and a unified diff against the current file in `<pre class="diff">`, produced from the file as it is now so it applies.
+- **New skill:** everything `manage-skills new` needs: `name` (lowercase letters, digits, hyphens, equal to the directory); `description` (third person, what it does then when it applies, under 400 characters, no angle brackets); invocation (`model-invocable` or `user-only`, with the reason); harnesses (`both`, `claude-code` or `codex`, with the reason when narrowed); `short_description` for `agents/openai.yaml` (25 to 64 characters); a draft `SKILL.md`.
+- **Skill edit** and **instruction change:** a unified diff made with `diff -u` from the current file, so it applies.
 
-**Instruction change.** A unified diff against `global/AGENTS.md` (or the repo `AGENTS.md` when the rule is repo-specific) in `<pre class="diff">`, produced with `diff -u` from the current file.
-
-A proposal is styled `proposed`; nothing in the report reads as applied.
+Evidence entries: id, harness, absolute transcript path, locator (line, plus message uuid for Claude Code or message id for Codex), local timestamp, a short excerpt.
