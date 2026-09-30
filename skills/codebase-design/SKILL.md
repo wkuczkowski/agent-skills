@@ -3,7 +3,7 @@ name: codebase-design
 description: Carries this repo's vocabulary and preferences for module design — deep modules, seams, testing through the interface. Use when designing or improving a module's interface, looking for deepening opportunities, deciding where a seam goes, making code more testable or easier for an agent to navigate, or when another skill needs the deep-module vocabulary.
 metadata:
   upstream: mattpocock/skills skills/engineering/codebase-design
-  upstream-commit: "321658273cb1d20b76026717d027d505790106d4"
+  upstream-commit: "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
   adopted: "2026-09-22"
 ---
 
