@@ -1,6 +1,20 @@
 # Evidence discipline
 
-Two jobs: stop you repeating fabricated statistics, and tell you when "just A/B test it" is real advice.
+Three jobs: define the evidence grades, stop you repeating fabricated statistics, and tell you when "just A/B test it" is real advice.
+
+## Grades
+
+Every rule in these references carries a grade, and the grade changes what may be claimed.
+
+| Tag | Meaning | How to speak about it |
+|---|---|---|
+| `(measured)` | Controlled experiment or large benchmark with a stated denominator | State the rule and the number |
+| `(qualitative)` | Moderated usability testing without published sample sizes | State the mechanism and the rule; never upgrade it into a promised outcome |
+| `(mechanism)` | The psychology replicates; this specific application does not have direct evidence | State the rule, name it as a design bet |
+| `(untested)` | Plausible, widely repeated, never measured in this domain | Propose it as a hypothesis, never as a best practice |
+| `(legal)` | Statute, regulation, or court decision | Non-negotiable; carries jurisdiction and status (`bright-lines.md`) |
+
+Combined tags (`(measured, observational)`, `(untested for conversion, defensible downstream)`) qualify the grade. A `(mechanism)` or `(untested)` rule is not laundered into a promise: "this will lift conversion" is a claim there is almost never standing to make.
 
 ## Never repeat these
 

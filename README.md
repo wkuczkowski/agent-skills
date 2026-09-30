@@ -37,16 +37,14 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 ### Design
 
-- **conversion-ux** — user-invoked: design paywalls, pricing, checkout, product pages and signup flows: evidence-graded behavioral levers, Baymard/NN-g findings, and the legal bright lines on deceptive patterns.
-- **ui-patterns** — user-invoked: pick the right pattern for search, empty states, browse screens, numeric input, disclosure, personalization and post-purchase.
-- **ux-critique** — user-invoked: audit an existing screen for usability, conversion and dark-pattern defects: two-stage find-then-filter, evidence contract per finding, hard exclusions.
+- **ux** — user-invoked: design or audit pricing, checkout, paywalls, product pages, signup, landing pages, search, forms, empty states and internal app screens; a routing table picks the references per screen: evidence-graded behavioral levers, Baymard/NN-g findings, the legal bright lines on deceptive patterns, and a two-stage find-then-filter audit with an evidence contract per finding.
 
 ## Provenance
 
-The three design skills are built on a source-verification pass over the behavioral-science and UX claims they encode: every claim was checked against primary sources, and each verdict was then attacked by an adversarial second pass.
+The `ux` skill is built on a source-verification pass over the behavioral-science and UX claims it encodes: every claim was checked against primary sources, and each verdict was then attacked by an adversarial second pass.
 
 It matters because a lot of this field is folklore. Ten widely-repeated claims turned out to be **fabricated** (no primary source at any point in the citation chain), including "70–90% of users never change defaults", "free samples lift purchases 2,000%", and "transparency bias" — which is not a research construct at all. Several others are real effects with the wrong attribution, the wrong mechanism, or a contested effect size.
 
-Rules in these skills are tagged `(measured)`, `(mechanism)`, `(untested)` or `(legal)`, and the tag governs how strongly they may be stated. `references/evidence.md` in `conversion-ux` carries the drop-list and the sample-size arithmetic that decides whether "just A/B test it" is advice or noise.
+Rules in `ux` are tagged `(measured)`, `(qualitative)`, `(mechanism)`, `(untested)` or `(legal)`, and the tag governs how strongly they may be stated. `references/evidence.md` in `ux` carries the drop-list and the sample-size arithmetic that decides whether "just A/B test it" is advice or noise.
 
 The legal sections are design guidance derived from primary sources, not legal advice — and the EU instruments were read from mirrors rather than the Official Journal, so confirm article-level wording before any of it drives a shipped compliance decision.

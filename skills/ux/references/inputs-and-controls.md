@@ -23,7 +23,7 @@ Why they fail in practice: `(measured)`
 
 Baymard's position, which is worth adopting verbatim: if you cannot implement non-linear scaling, visually distinct dual handles, click-to-position on the track, and a text fallback, **do not use a slider at all**.
 
-Accessibility is not optional here: `(legal)`
+Accessibility requirements `(legal)`, from `bright-lines.md` A5–A6:
 
 - **WCAG 2.2 SC 2.5.7 Dragging Movements (AA) names range sliders explicitly** and requires a single-pointer, non-dragging alternative. A clickable track plus arrow-key stepping satisfies it.
 - Expose `role="slider"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and `aria-valuetext`, so a screen reader announces "£40, medium" rather than "40".
@@ -41,7 +41,7 @@ Wheel pickers also hide the range: the user cannot see the minimum, maximum, or 
 
 Use a text input with the right keyboard and the right constraints. Set `inputmode` so mobile users get a numeric keypad, and use `autocomplete` tokens where the field collects information about the user — WCAG 2.1 SC 1.3.5 makes this a conformance issue for user-information fields, and `autocomplete` is the sufficient technique.
 
-**Accept the format the user types and clean it up** rather than rejecting it: spaces in card numbers, dashes in phone numbers, units after a figure. 80% of sites don't allow or auto-format spaces in card numbers.
+**Accept the format the user types and clean it up** rather than rejecting it: spaces in card numbers, dashes in phone numbers, units after a figure (card-field counts in `checkout.md`).
 
 **A caution:** the design intent here — typed entry for precise values — is sound, but the native `<input type="number">` element has known behavioural defects across browsers (scroll-wheel value changes, silent rejection of non-numeric input, inconsistent spinner behaviour, locale handling). This was flagged as unverified in the research behind this skill. Before defaulting to it, check the current GOV.UK Design System guidance and MDN, and consider `inputmode="numeric"` on a text input instead.
 
@@ -57,7 +57,7 @@ The reason: **55% of users open a drop-down purely to see what is in it and imme
 
 **Do not conclude that drop-downs are lazy design.** They remain correct when the user does not know the option set and cannot type it — country and state selectors are drop-downs on purpose. Prefer **native** selects when a select is warranted: 31% of sites with custom-built drop-downs have usability defects in them.
 
-For variant selection on a product page, exposed buttons or swatches win outright — see the `conversion-ux` skill.
+For variant selection on a product page, exposed buttons or swatches win outright — see `product-pages.md`.
 
 ## Radio buttons
 
@@ -77,11 +77,6 @@ There is **no published threshold** for what counts as a dominant enough choice 
 
 Auditable rule: any `input[type=checkbox][checked]` whose label mentions marketing, newsletter, terms, sharing or consent is a defect.
 
-## Text fields, generally
+## Text fields
 
-- **Persistent visible label above the field.** Placeholders as labels strain memory, prevent pre-submit verification, are mistaken for pre-filled values, and announce unreliably.
-- **Field width signals expected input length** — a postcode field the width of a street address invites the wrong thing.
-- **Single column.** Multiple columns interrupt vertical momentum; City/State/Zip on one row is the standard exception.
-- **Validate on blur**, or once the character count is correct for fixed-length inputs. Never validate mid-typing on a value that will become valid. Clear the error the instant the input becomes valid.
-- **Preserve input on failed submit.** This is a WCAG 2.2 Level A requirement, not a nicety.
-- **No Reset or Clear buttons.** The risk of accidental deletion outweighs the unlikely need to start over.
+Labels, field width, column layout, validation timing, input preservation and the no-Reset rule are in `forms.md`.

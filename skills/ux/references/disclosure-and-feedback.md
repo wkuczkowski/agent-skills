@@ -51,22 +51,14 @@ The discriminating variable is **forced dismissal**: formats requiring a dismiss
 
 Rules:
 
-- One ask per visit, remembered. Re-prompting a user who already declined is a rule violation in Colorado and under the DSA.
+- One ask per visit, remembered. Re-prompting a user who already declined is a rule violation in Colorado and under the DSA (`bright-lines.md` L12).
 - Prefer inline placement over interruption. An inline banner that scrolls past costs nothing; a modal costs the user an action.
 - Reserve modals for what genuinely blocks: a destructive confirmation, a required legal acknowledgement.
 - Do not trigger browser-native `alert()`/`confirm()` for routine flows — habituation makes them worthless, and they block everything.
 
 ## Errors and confirmation
 
-- **Inline, per field, adjacent to the offending input.** Never a top-of-form summary alone. Never a hover or focus tooltip.
-- **Text + icon + colour**, never colour alone. Distinct visual states for error, warning and success.
-- **Name the actual violation.** "Phone number can only contain numbers" — not "Please enter a valid phone number". 98% of sites use generic messages; only 2% target the violation, and participants have taken up to five minutes to resolve trivial errors. `(measured)`
-- Confirm success inline for complex fields, not only failure.
-- **When users hit the same error three or more times, treat it as a design defect**, not user error.
-
-**Slips vs mistakes need different fixes.** *Slips* are autopilot errors: fix with constraints (a date picker that cannot select a return before departure), good defaults, and forgiving formatting that accepts any input shape and reformats it. *Mistakes* are wrong mental models: fix with conventions, clear signifiers, a preview before commitment, and keeping context visible across multi-step flows.
-
-**Confirmation policy:** undo by default; confirmation reserved for the irreversible; escalated friction (re-entering a password) only for the catastrophic. Blanket confirmation dialogs produce habituation and protect nobody.
+Error placement, wording, colour, repeat errors, slips vs mistakes and the confirmation policy are in `forms.md`; they apply to non-form errors too. An error state outside a form leaves a route forward rather than only reporting failure.
 
 ## Microcopy
 
@@ -74,7 +66,7 @@ Microcopy is **fewer than three sentences**. Classify each piece by **one** prim
 
 Button labels are *interaction* microcopy: state what happens on click. The most common failure is one label trying to do all three jobs at once — informing, persuading and instructing in four words.
 
-For links and buttons: **Specific, Sincere, Substantial, Succinct**, in that priority order. Specificity beats brevity when they conflict, because eyetracking shows users read links without the surrounding text — the label must work in isolation. There is no word limit; an 11-word link has outperformed a vague two-word one. Clarify ambiguous actions ("Continue to payment"); do not decorate already-clear ones.
+For links and buttons: **Specific, Sincere, Substantial, Succinct**, in that priority order `(measured)`. Specificity beats brevity when they conflict, because eyetracking shows users read links without the surrounding text — the label must work in isolation. There is no word limit; an 11-word link has outperformed a vague two-word one. "Learn more" is the new "Click here". Clarify ambiguous actions ("Continue to payment", not "Continue"); do not decorate already-clear ones. The primary purchase button stays literal and conventional (`product-pages.md`, "CTA").
 
 ## Timing budget
 

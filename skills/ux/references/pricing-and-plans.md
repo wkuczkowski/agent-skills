@@ -49,7 +49,7 @@ Round numbers suit hedonic, feelings-driven purchases; precise numbers suit util
 
 A struck-through reference price with a percentage badge reliably raises perceived value and lowers search intention in lab studies — including, notoriously, when the reference price is **exaggerated**, which is exactly why regulators intervened. `(measured in lab, legally constrained)`
 
-`(legal)` **In the EU, any struck-through "was" price and any percentage-off must be computed from the lowest price actually charged in the previous 30 days** (Omnibus Directive Art. 6a; CJEU C-330/23 *Aldi Süd*). The implementation requirement follows: build the reference price as a **data field sourced from real price history**, and make it structurally impossible for a merchandiser to type one in. In the US a "former price" must be a bona fide price offered regularly for a reasonably substantial period (16 CFR 233.1).
+`(legal)` **In the EU, any struck-through "was" price and any percentage-off must be computed from the lowest price actually charged in the previous 30 days** (Omnibus Directive Art. 6a; CJEU C-330/23 *Aldi Süd*; `bright-lines.md` L23). The implementation requirement follows: build the reference price as a **data field sourced from real price history**, and make it structurally impossible for a merchandiser to type one in. In the US a "former price" must be a bona fide price offered regularly for a reasonably substantial period (16 CFR 233.1; L24).
 
 An EU price-marketing sweep of 314 traders found roughly **30% failed** discount-display rules. This is actively enforced.
 
@@ -57,7 +57,7 @@ An EU price-marketing sweep of 314 traders found roughly **30% failed** discount
 
 Presenting an add-on next to a much larger purchase, expressed as a share of it ("just 2.6%"), rests on proportional thinking — which is established (people will drive 20 minutes to save $5 on a $15 item but not on a $125 one) but happens **spontaneously in the head**. No published study tests the explicit percentage badge, and it may equally trigger reactance. `(untested)`
 
-Anchoring on willingness to pay is much weaker than anchoring on numeric judgments: anchors moved hypothetical WTP but had **no effect on valuations in real, incentive-compatible transactions** (Brzozowicz & Krawczyk 2022, N = 1,803).
+Anchoring on willingness to pay is much weaker than anchoring on numeric judgments, which is among the best-replicated effects in psychology (Many Labs 1): anchors moved hypothetical WTP but had **no effect on valuations in real, incentive-compatible transactions** (Brzozowicz & Krawczyk 2022, N = 1,803).
 
 Treat the whole "control the first number they see" family as a hypothesis worth testing, not a rule — and read `evidence.md` first to check whether you can reach the sample size.
 

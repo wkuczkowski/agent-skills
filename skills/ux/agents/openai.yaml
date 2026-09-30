@@ -1,0 +1,6 @@
+interface:
+  display_name: "UX"
+  short_description: "Design or audit pricing, checkout, forms and app screens"
+  default_prompt: "Use $ux to design or review this screen."
+policy:
+  allow_implicit_invocation: false

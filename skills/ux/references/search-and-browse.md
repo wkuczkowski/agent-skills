@@ -64,7 +64,7 @@ Hard requirements regardless of style:
 
 - Text over an image must meet contrast requirements **at the worst point of the image**, not the average. If you cannot guarantee that across the set, put the text outside the image.
 - Category labels must be the words users use, not internal taxonomy.
-- Touch targets and spacing per the non-negotiables in SKILL.md.
+- Touch targets and spacing per `bright-lines.md` A4 and A10.
 
 ## Product lists
 

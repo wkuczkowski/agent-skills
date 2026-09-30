@@ -59,9 +59,7 @@ Where you use it:
 
 ## Nagging
 
-Modal interruptions are the most-hated technique measured on both desktop and mobile (452 US adults, average dislike 5.23 of 7, mobile significantly worse, p < 0.0001). The discriminating variable is **forced dismissal** — formats requiring an action scored worst; formats leaving control with the user scored best. This applies directly to upsell interstitials, newsletter modals and exit-intent popups. `(measured)`
-
-Re-prompting a user who already declined, within the same visit, is a rule violation in Colorado and under the DSA (L12).
+Upsell interstitials, newsletter modals and exit-intent popups are the modal-interruption case in `disclosure-and-feedback.md` ("Modals and interruption"): forced dismissal is what users hate most. Re-prompting a user who already declined, within the same visit, is a rule violation in Colorado and under the DSA (`bright-lines.md` L12).
 
 ## Checklist
 

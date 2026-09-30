@@ -1,6 +1,6 @@
 # Sweeps
 
-The finding pass. Run only the sweeps for surfaces actually present in scope. Every hit is a *candidate* — it still has to survive stage 2 and the evidence contract.
+The finding pass. Run only the sweeps for surfaces actually present in scope. Every hit is a *candidate* — it still has to survive stage 2 and the evidence contract (`review.md`). The numbers below are condensed from the build references (`checkout.md`, `forms.md`, `product-pages.md`, `pricing-and-plans.md`, `search-and-browse.md`), which carry the sources.
 
 ## Universal sweep — run on any screen
 
@@ -8,7 +8,7 @@ The finding pass. Run only the sweeps for surfaces actually present in scope. Ev
 
 **The unanswered objection.** Name the one thing that would make this user say no. Search the screen for the answer. If it is not there, that is usually the highest-value finding on the page.
 
-**The blank-slot test.** Any number on screen — counts, ratings, timers, stock levels, "N people viewing" — trace it to a source. A number nobody can reproduce is a finding, and if it is fabricated it is a P0 (see `deceptive-patterns.md`).
+**The blank-slot test.** Any number on screen — counts, ratings, timers, stock levels, "N people viewing" — trace it to a source. A number nobody can reproduce is a finding, and if it is fabricated it is a P0 (see `bright-lines.md`).
 
 **States you have not seen.** Note them rather than guessing: hover, focus, active, disabled, loading, empty, error, long content, zero results, dark mode, 320px width, 200% zoom.
 
@@ -77,6 +77,10 @@ The finding pass. Run only the sweeps for surfaces actually present in scope. Ev
 - Is a "no records" message shown while data is still loading?
 - Are the first-run and filtered-to-nothing states distinguished?
 - Do error states leave a route forward, or just report failure?
+
+## Deceptive patterns and law
+
+Run the tables in `bright-lines.md` for the surfaces present — consent, pressure, subscriptions, social proof, price display. Hits are P0 or P1 by default and are reported in the format at the end of that file.
 
 ## Accessibility pass
 

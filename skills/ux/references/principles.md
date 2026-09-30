@@ -2,7 +2,7 @@
 
 Each lever: **Rule** → **Mechanism** (with its evidence grade) → **Boundary** (when it backfires). The boundary is not a footnote — most of these levers have a documented reversal.
 
-Grades: `(measured)` controlled evidence · `(mechanism)` psychology replicates, this application untested · `(untested)` never measured in this domain · `(legal)` binding.
+Grades are defined in `evidence.md`; `(contested)` below marks a main effect on which meta-analyses disagree.
 
 ---
 
@@ -88,9 +88,7 @@ Grades: `(measured)` controlled evidence · `(mechanism)` psychology replicates,
 
 **Boundary.** It reverses when the flaw is material, when it leads the message, or when the source is not already perceived as competent. Note that "we'll remind you before we charge" is not a downside disclosure at all; it is reassurance about a known risk.
 
-**Rule** `(measured)`. Make CTA and link labels **Specific, Sincere, Substantial, Succinct** — in that priority order. Specificity beats brevity when they conflict, because eyetracking shows users read links without the surrounding text, so a label must work in isolation. "Learn more" is the new "Click here".
-
-**Boundary.** Clarify ambiguous actions ("Continue to payment", not "Continue"); do not decorate an already-clear one. Keep the primary purchase button literal and conventional — "Add to cart" is the most-scanned element on a product page and users pattern-match on the familiar word. Put brand voice in the microcopy beneath it.
+**CTA and link labels** — Specific, Sincere, Substantial, Succinct, and a literal primary purchase button — are in `disclosure-and-feedback.md` ("Microcopy") and `product-pages.md` ("CTA").
 
 **Specificity in claims** `(mechanism)`. Precise figures read as measured rather than estimated, and anchor more strongly — but only when attributed to a human communicator with conversational intent, and only among consumers low in advertising skepticism (Zhang & Schwarz 2012/2013; Xie & Kronrod 2012). Round numbers work better for feelings-driven purchases. The conversion half of "specificity is trust" has no source.
 
@@ -98,30 +96,10 @@ Grades: `(measured)` controlled evidence · `(mechanism)` psychology replicates,
 
 ## 7. Pricing presentation
 
-**Rule.** Prefer a single committed price over a range — ranges add uncertainty and make comparison harder, and a range typically produces lower valuations than a single price (Tanford, Choi & Joe 2019).
-
-**Boundary.** Do not commit to a number you cannot honour; a quoted price that changes at checkout is worse than an honest range and can be an unfair commercial practice in the UK and EU. If price genuinely varies, show one number plus an explicit plain-language condition — not a silent range.
-
-**Rule** `(measured)`. Charm pricing only pays at a **left-digit boundary**. Nine-endings are perceived as smaller "only when the leftmost digits differ" — $2.99 vs $3.00 works, $3.29 → $3.19 buys nothing (Thomas & Morwitz 2005). Pick the price, check whether one unit down crosses a leading digit, take it if it does, and otherwise do not contort the number.
-
-**Rule** `(mechanism)`. If you add a high tier, justify it as serving a real segment *and* as a reference point, then measure whether it moves mix. The mechanism is **extremeness aversion / the compromise effect** (Simonson & Tversky 1992) — intermediate options gain appeal — not the attraction effect.
-
-**Boundary.** Do not build an attraction-effect decoy. With images, brands and more than two comparison dimensions — i.e. every real pricing page — an asymmetrically dominated decoy can pull share *away* from its target.
-
-**Anchoring** `(mechanism)`. Anchoring on numeric judgments is among the best-replicated effects in psychology (Many Labs 1). Anchoring on **willingness to pay** is much shakier: anchors moved hypothetical WTP but had no effect on valuations in real, incentive-compatible transactions (Brzozowicz & Krawczyk 2022, N = 1,803). Relative framing ("just 2.6% of your purchase") rests on proportional thinking, which is established — but happens spontaneously in the head, and no study tests the explicit badge.
-
-**Any struck-through comparator is regulated.** See `bright-lines.md` L23–L24.
+Single price vs range, charm pricing at a left-digit boundary, the compromise effect vs the attraction-effect decoy, and anchoring on willingness to pay are in `pricing-and-plans.md`. Any struck-through comparator is regulated (`bright-lines.md` L23–L24).
 
 ---
 
 ## 8. Controls and inputs
 
-**Rule** `(measured)`. Match the control to whether the user is **exploring** a value or **stating** one they already know. Where both matter, link a slider to a text field showing the same value. Never ship a slider as the only way to set a number.
-
-**Boundary.** Baymard: **83% of top-50 sites using sliders apply a linear scale to non-linearly distributed data**, so half the track controls 2–10% of outcomes; >50% of test subjects misread dual-handle sliders as single-point controls. Their position: if you cannot implement non-linear scaling, distinct handles, click-to-position and a text fallback, do not use a slider at all. Sliders are also named explicitly in WCAG 2.2 SC 2.5.7 — see `bright-lines.md` A5.
-
-**Rule** `(measured)`. Drop-down thresholds: **under ~5 options → radio buttons or a segmented control; 5–10 → drop-down acceptable; over ~10 → autocomplete, lookup, or auto-detect.** 55% of users open a drop-down purely to see what is inside and immediately close it.
-
-**Boundary.** Do not conclude "drop-downs are lazy". They remain correct when the user does not know the option set and cannot type it, and native selects beat custom ones — 31% of sites with custom drop-downs have usability defects in them. Country and state selectors are drop-downs on purpose.
-
-**Rule.** Pre-select one radio button in a group by default — a radio cannot be deselected once clicked, so an all-unselected group traps users who change their mind. Exceptions: you genuinely do not know the preference, the pre-selection risks offending (gender, title), or law forbids it.
+Exploring vs stating a value, linked slider and text field, slider failure rates, drop-down thresholds and radio defaults are in `inputs-and-controls.md`.
