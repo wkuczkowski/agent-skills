@@ -13,7 +13,7 @@ The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the re
 - Vendor skills under `.agents/skills/` stay verbatim; `npx skills` owns them. Changing one means adopting it.
 - Own skills default to both harnesses and model invocation. A user-only own skill needs both `disable-model-invocation: true` in the frontmatter and `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; the frontmatter is the truth and `bin/link check` reports mismatches.
 - Retiring a skill, deleting files and changing skill content happen only after the user has said so. Reviews propose; they do not apply.
-- English throughout, in skills and in the report. Reports the user reads are HTML on the house template; Markdown stays for agent-facing files.
+- English throughout in skills and files for agents. What the user reads is a short message in his language, in the chat or in `reports/<date>/review.md`; he practically never reads long reports.
 
 ## Operations
 
@@ -29,4 +29,4 @@ The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the re
 
 **retire.** Confirm the skill and the consequence with the user first. Vendor: `bin/unvendor <name>` in the repo (never `npx skills remove`, it also deletes an own directory of the same name). Own: delete `skills/<name>` or `private/<name>` (`git rm -r` when tracked). Remove the manifest entry. `bin/link`, `bin/link check`.
 
-**review weekly** and **review monthly.** Follow [references/review.md](references/review.md). Weekly writes `usage.yaml`, runs `workflow-from-chats` for the candidates from conversations, reads own skills and both instruction files together for contradictions, and builds the report `reports/<date>/review.html` on the house template (`assets/report/README.md`) with the raw data files beside it; monthly adds a research refresh from [references/research-prompts.md](references/research-prompts.md), a compliance pass over every own skill and `global/AGENTS.md`, and the consistency read widened to vendor skills. `bin/review-run` is what the Monday timer calls; it picks weekly or monthly and runs the review headlessly.
+**review weekly** and **review monthly.** Follow [references/review.md](references/review.md). Weekly writes `usage.yaml`, runs `workflow-from-chats` for the candidates from conversations, reads own skills and both instruction files together for contradictions, and writes the short message `reports/<date>/review.md` with the raw data files and proposal diffs beside it; monthly adds a research refresh from [references/research-prompts.md](references/research-prompts.md), a compliance pass over every own skill and `global/AGENTS.md`, and the consistency read widened to vendor skills. `bin/review-run` is what the Monday timer calls; it picks weekly or monthly and runs the review headlessly.
