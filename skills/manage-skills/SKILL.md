@@ -5,7 +5,7 @@ description: Manages the user's skill collection in the agent-skills repo. Lists
 
 # Manage skills
 
-The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the repo), and every `bin/*` and `npx skills` command runs from there. The repo's `AGENTS.md` describes how it works and `GLOSSARY.md` its vocabulary. How a skill is written, and what makes one finished, is in the `writing-for-agents` skill. The user's instructions take precedence over this skill.
+The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the repo), and every `bin/*` and `npx skills` command runs from there. The repo's `AGENTS.md` describes how it works and `GLOSSARY.md` its vocabulary. How a skill is written is in the `writing-for-agents` skill; what makes one finished here is below. The user's instructions take precedence over this skill.
 
 ## Facts about the repo
 
@@ -21,6 +21,15 @@ The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the re
 - `npx skills remove` also deletes `skills/<name>` when an own directory of that name exists (2026-09-06). A vendor skill leaves through `bin/unvendor <name>`, which removes only `.agents/skills/<name>` and its lock entry.
 - `npx skills check` reinstalls vendor skills as a side effect (2026-10-05); `bin/upstream` reports changes without touching anything.
 - Retiring a skill, deleting files and changing skill content are the user's decisions; a review proposes and does not apply.
+
+## A skill here is done when
+
+For a new skill or a material change; a small edit needs 1 and 2. The user may waive any item.
+
+1. `claude plugin validate --strict skills` passes. It accepts only a directory named `skills`, so a private skill is validated from a scratch copy.
+2. The `manifest.yaml` entry exists, `bin/link` has run and `bin/link check` is clean (it also reports invocation-flag mismatches and the Codex catalog size).
+3. A headless run per harness with a matching prompt shows the skill invoked (`writing-for-agents` says what counts as proof). It runs from outside the repo, since a Codex session inside it sees every vendor skill whatever the manifest says.
+4. Nothing it names (path, flag, command) is missing, and no other skill or the global instructions say otherwise.
 
 ## Operations
 
