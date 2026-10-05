@@ -1,0 +1,6 @@
+interface:
+  display_name: "Grilling"
+  short_description: "Stress-test a plan, asking only the user's decisions"
+  default_prompt: "Use $grilling on this plan."
+policy:
+  allow_implicit_invocation: false
