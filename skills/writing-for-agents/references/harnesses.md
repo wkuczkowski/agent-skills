@@ -98,13 +98,4 @@ A skill listed but not invoked on its trigger is usually a pointer problem: chec
 
 ## Repo standard
 
-Own skills live under `skills/<name>/` (public) or `private/<name>/`. A finished skill has:
-
-1. `SKILL.md` with `name`, `description` and, for adoptions, `metadata.upstream` and `metadata.adopted`; optional `references/`, `scripts/`, `assets/`.
-2. `agents/openai.yaml` with an `interface` block, plus `policy` for user-only.
-3. A `manifest.yaml` entry: `kind: own`, `adopted: true` and `upstream: <owner/repo> <path>/SKILL.md@<sha>` for adoptions, `harnesses:` only when narrowed. `bin/upstream` parses that exact form.
-4. `bin/link` run, `bin/link check` clean apart from known findings, `claude plugin validate` clean.
-5. The headless test above passed in both harnesses.
-6. No overlap with the skills sharing its triggers and no contradiction of `global/AGENTS.md` (`SKILL.md`, "A skill is done when").
-
-The `manage-skills` skill runs the adoption interview and the manifest edits; this skill sets the writing and the standard.
+The checklist for a finished skill is in `SKILL.md`, "A skill is done when"; the `manage-skills` skill carries the adoption and the manifest edits.

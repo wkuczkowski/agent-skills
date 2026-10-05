@@ -22,14 +22,11 @@ The aim is a plan the user and the agent understand the same way, with every bra
 ## How the open points split
 
 - **Facts** about the code, the environment, the docs or the law: found by the agent or a subagent, never asked. A legal question goes to research and a critic, not to him.
-- **Decisions the agent can carry**: technical and reversible choices with a defensible answer. The agent decides, and on a contested one a critic subagent with fresh context checks it. They reach the user as a short "decided" list he can override, not as questions.
+- **Decisions the agent can carry**: technical and reversible choices with a defensible answer. The agent decides, and on a contested one a critic subagent with fresh context checks it. He sees them and can override them; they are not questions.
 - **His decisions**: preferences, what he or the firm wants, scope and direction, money, anything visible to clients or colleagues, and steps no one can undo. Only these are questions.
 
-## Rounds
+## Asking
 
-- A round holds the few questions whose answers unblock the most, each with a recommendation and its reason, answerable in a word. A question that depends on another still open waits for the next round.
-- An unfamiliar concept gets one plain sentence of explanation inside the question.
-- The round also carries the decided list since the last round, a line per item, and any better route the agent sees.
-- Questions go in the user's language.
+The aim of each round is that his decisions are easy to make and that he can see, and override, what was decided for him. How the questions are put is the agent's and the harness's call. Two observations from the record: he has decided fastest when a question carried a recommendation with its reason, and he answers in his own language. A question that depends on another still open waits for its answer, and a better route the agent sees is worth raising at any point.
 
 The session ends when no decision of his is open. A short summary of what was decided, by whom, closes it, and the work waits for his go-ahead. The user's instructions take precedence over this skill: when he says to decide on your own, that covers the rest of the session.

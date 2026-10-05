@@ -10,8 +10,8 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 
 ### Managing skills and instructions
 
-- **manage-skills** — lists what Claude Code or Codex sees, adds vendor skills, adopts a vendor skill through an interview, retires skills, and runs a weekly or monthly review of the whole collection (usage from transcripts, upstream changes, drift, vendor-guidance refresh).
-- **writing-for-agents** — the mechanics of a finished skill or instruction file: layout, frontmatter, invocation flags, what Claude Code and Codex load, how a skill is proven to fire. The register itself lives in the global instructions.
+- **manage-skills** — lists what Claude Code or Codex sees, adds vendor skills, adopts a vendor skill, retires skills, and runs a weekly or monthly review of the whole collection (usage from transcripts, upstream changes, drift, vendor-guidance refresh).
+- **writing-for-agents** — what earns a line in a skill or instruction file (facts, dated lessons, what the user rejected, the goal rather than the steps) and the mechanics of a finished one: layout, frontmatter, invocation flags, what Claude Code and Codex load, how a skill is proven to fire.
 
 - **diagnosing-bugs** — holds a diagnosis at reproducing and locating the failure before code changes. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills) and thinned to that one correction.
 - **codebase-design** — deep modules, seams, testing through the interface: the vocabulary other skills use and the user's design preferences. Adopted from mattpocock/skills.
@@ -30,7 +30,7 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 ### Workflows
 
 - **research** — investigate a question against primary sources, delegating the reading to one or several subagents, and write verified findings into the repo for other agents to use. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
-- **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs) in the form `manage-skills new` takes, deduplicated against the manifest, answered in the chat, with the evidence and ready diffs in a working file for the agent that applies them.
+- **workflow-from-chats** — mine Codex and Claude Code conversations since the last run for proposals (new skills, skill edits, instruction diffs), deduplicated against the manifest, answered in the chat, with the evidence and ready diffs in a working file for the agent that applies them.
 
 ### Agent CLIs
 

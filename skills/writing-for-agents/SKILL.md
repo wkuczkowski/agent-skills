@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: Holds the mechanics of a finished skill and instruction file in this collection (layout, frontmatter, invocation flags, what each harness loads, how a skill is proven to fire). Use when creating or editing a skill, AGENTS.md or CLAUDE.md, when deciding whether a skill is model-invocable or user-only, or when a skill fails to fire on its trigger.
+description: Holds what earns a line in a skill or instruction file in this collection, and the mechanics of a finished one (layout, frontmatter, invocation flags, what each harness loads, how a skill is proven to fire). Use when creating or editing a skill or its description, AGENTS.md or CLAUDE.md, when deciding whether a skill is model-invocable or user-only, or when a skill fails to fire on its trigger.
 metadata:
   upstream: mattpocock/skills skills/productivity/writing-for-agents
   upstream-commit: "321658273cb1d20b76026717d027d505790106d4"
@@ -9,7 +9,20 @@ metadata:
 
 # Writing for agents
 
-The register is the one in the global instructions (`global/AGENTS.md`, sections "The user" and "How the work tends to go"): facts the model cannot guess and observations about what has worked, in English, with imperatives only where a wrong guess costs data, security, an irreversible action or a decision the user made. What follows is the mechanics, which the harnesses fix and the model cannot look up: [references/harnesses.md](references/harnesses.md) for what Claude Code and Codex load and how to test it, [references/models.md](references/models.md) for how Fable 5.1 and Astra react to instruction text.
+## What earns a line
+
+The models these files are written for are capable and change every few weeks, and a line written for one of them ages with it. A line earns its place when removing it would change what an agent decides. In practice that has been:
+
+- **Facts the agent cannot find on its own**: paths, commands, URLs, how this machine and repo are set up, fields in a format nobody documents. Dated, with what they were checked against.
+- **Lessons from what went wrong**, dated: "`npx skills remove` also deletes `skills/<name>`" (2026-09-06). A lesson ages slowly and does not narrow the agent's options.
+- **What the user dislikes or has rejected.** What he likes is riskier to write down: an agent that reads it may stop there instead of proposing something better, and he wants better options proposed (`global/AGENTS.md`, "The user").
+- **The goal and what done looks like**, rather than the steps to get there; the method is the agent's. Steps belong in a file only where their order is fixed and a wrong order breaks something (a sequence of repo commands, a data or security boundary, an irreversible action).
+
+How the agent talks to the user (the shape of a question, a report, a reply) is left to the model and the harness, which keep adding their own interactive ways to ask. A file can name the aim, a decision the user can make easily, in his language, and leave the form open.
+
+Imperatives sit only where a wrong guess costs data, security, an irreversible action or a decision the user made; everywhere else the line is a fact or an observation. Files and skills are in English. A skill that could conflict with the user's request says that his instructions take precedence; without that line, GPT-6 Astra stalled on such skills (2026-09).
+
+The rest of this skill is mechanics the harnesses fix: [references/harnesses.md](references/harnesses.md) for what Claude Code and Codex load and how to test it.
 
 ## Descriptions
 
@@ -24,7 +37,6 @@ The register is the one in the global instructions (`global/AGENTS.md`, sections
 - Model-invocable is the default: no invocation flag, and `agents/openai.yaml` with an `interface` block only (`display_name`, `short_description` of 25 to 64 characters, `default_prompt` mentioning `$<name>`).
 - User-only needs both `disable-model-invocation: true` in the frontmatter and `policy.allow_implicit_invocation: false` in `agents/openai.yaml`; Codex ignores the frontmatter flag. It fits a workflow with side effects that only a human should start.
 - `SKILL.md` is a real file; Codex skips a symlinked one silently. The skill directory and `references/` may be symlinks.
-- Astra stalls on a skill that could conflict with the user's request unless the skill says the user's instructions take precedence.
 
 ## Global and project instructions
 
