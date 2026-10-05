@@ -1,32 +1,29 @@
 ---
 name: manage-skills
-description: Manages the user's skill collection in the agent-skills repo. Lists which skills Claude Code or Codex sees, adds vendor skills, writes new own skills, adopts a vendor skill through an interview, retires skills, edits the manifest, and runs the weekly or monthly review. Use when the user asks what skills a harness sees, wants to add, adopt, retire or review skills, or wants the manifest changed.
+description: Manages the user's skill collection in the agent-skills repo. Lists which skills Claude Code or Codex sees, adds vendor skills, writes new own skills, adopts a vendor skill, retires skills, edits the manifest, and runs the weekly or monthly review. Use when the user asks what skills a harness sees, wants to add, adopt, retire or review skills, or wants the manifest changed.
 ---
 
 # Manage skills
 
-The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the repo). Run every `bin/*` and `npx skills` command with the repo as the working directory, whatever directory the session started in. The repo's `AGENTS.md` holds the rules and `GLOSSARY.md` the vocabulary; read them once per session before changing anything. The user's instructions take precedence over this skill.
+The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the repo), and every `bin/*` and `npx skills` command runs from there. The repo's `AGENTS.md` describes how it works and `GLOSSARY.md` its vocabulary. How a skill is written, and what makes one finished, is in the `writing-for-agents` skill. The user's instructions take precedence over this skill.
 
-## Conventions
+## Facts about the repo
 
-- `manifest.yaml` is the source of truth for what exists and which harness sees it; `bin/link` projects it onto `~/.claude/skills` and `~/.agents/skills`. After any change to the manifest, `skills/`, `private/` or `.agents/skills/`, run `bin/link` and then `bin/link check`. A clean check reports 0 findings; `~/.claude/skills/synced` (the desktop app's account skills) is exempt.
-- Vendor skills under `.agents/skills/` stay verbatim; `npx skills` owns them. Changing one means adopting it.
-- Own skills default to both harnesses and model invocation. A user-only own skill needs both `disable-model-invocation: true` in the frontmatter and `agents/openai.yaml` with `policy.allow_implicit_invocation: false`; the frontmatter is the truth and `bin/link check` reports mismatches.
-- Retiring a skill, deleting files and changing skill content happen only after the user has said so. Reviews propose; they do not apply.
-- English throughout in skills and files for agents. What the user reads is a short message in his language, in the chat or in `reports/<date>/review.md`; he practically never reads long reports.
+- `manifest.yaml` says what exists and which harness sees it. `bin/link` projects it onto `~/.claude/skills` and `~/.agents/skills`, and `bin/link check` reports drift; a clean check reports 0 findings, and `~/.claude/skills/synced` (the desktop app's account skills) is exempt. Both run after any change to the manifest, `skills/`, `private/` or `.agents/skills/`.
+- `bin/link list <claude-code|codex>` prints what a harness sees. A Codex session started inside the repo also sees every vendor skill through the project `.agents/skills` root, whatever the manifest says.
+- `bin/usage` counts invocations from transcripts (`--write` updates `usage.yaml`, `--unused` lists retirement candidates), and `bin/upstream` reports upstream changes per skill (`--diff <name>` shows one).
+- Vendor skills under `.agents/skills/` are verbatim copies that `npx skills update` overwrites. A vendor skill is added with `npx skills add <owner/repo> -a codex -y -s <name>` and a manifest entry `kind: vendor`, `upstream: <source> <skillPath>` copied from `skills-lock.json`.
+- `skills/` is public on GitHub, `private/` stays on this machine; `.gitignore` is a whitelist.
+- The user browses the collection on a private Artifact page, https://claude.ai/artifact/DKsxYM2rxYmuYjbqbMcZak, a snapshot that does not update itself. `bin/catalog` writes `reports/skills-catalog.html`, which Claude Code republishes to that URL after a change to skills, the manifest or `global/AGENTS.md`; Codex and headless runs cannot publish and say so. The page embeds `global/AGENTS.md`, so it stays out of git and is never shared publicly.
+
+## Lessons
+
+- `npx skills remove` also deletes `skills/<name>` when an own directory of that name exists (2026-09-06). A vendor skill leaves through `bin/unvendor <name>`, which removes only `.agents/skills/<name>` and its lock entry.
+- `npx skills check` reinstalls vendor skills as a side effect (2026-10-05); `bin/upstream` reports changes without touching anything.
+- Retiring a skill, deleting files and changing skill content are the user's decisions; a review proposes and does not apply.
 
 ## Operations
 
-**list.** `bin/link list claude-code` or `bin/link list codex` prints name, kind, invocation mode, status and source path. Answer from that output alone; compare harnesses only after running both lists. A Codex session started inside the repo additionally sees every vendor skill through the project `.agents/skills` root, whatever the manifest says.
-
-**status.** `bin/link check` plus a summary of the manifest: counts per kind, drafts, `keep: true`, skills narrowed to one harness, adopted skills and their upstream. Manifest edits the user may ask for here: narrow a skill with `harnesses: [claude-code]` or `[codex]`; mark `status: draft` or `keep: true`; move an own skill between `skills/` (public, pushed to GitHub) and `private/` (this machine only) with `git mv`, the manifest entry stays as it is. Then `bin/link` and `bin/link check`.
-
-**add-vendor.** In the repo: `npx skills add <owner/repo> -a codex -y -s <name>`. Add a manifest entry with `kind: vendor` and `upstream: <source> <skillPath>` copied from the new `skills-lock.json` entry, plus `harnesses:` when the user wants one harness only. `bin/link`, `bin/link check`.
-
-**new.** Write the skill under `skills/<name>/` in the register of `global/AGENTS.md` (facts and observations, imperatives only where a wrong guess costs something real) and with the mechanics in the `writing-for-agents` skill: name in lowercase letters, digits and hyphens matching the directory; a third-person description that states what the skill does and when it applies; short body with substantial reference in `references/`. Add `agents/openai.yaml` with an `interface` block (`display_name`, `short_description` of 25 to 64 characters, `default_prompt` mentioning `$<name>`). Manifest entry `kind: own`. `bin/link`, `bin/link check`; the check runs `claude plugin validate` over `skills/`.
-
-**adopt.** Turn a vendor skill into an own skill through the interview in [references/adopt.md](references/adopt.md). The result is a rewrite under `skills/<same name>`, a manifest entry with `adopted: true` and a pinned upstream, and the vendor copy removed from `skills-lock.json`.
-
-**retire.** Confirm the skill and the consequence with the user first. Vendor: `bin/unvendor <name>` in the repo (never `npx skills remove`, it also deletes an own directory of the same name). Own: delete `skills/<name>` or `private/<name>` (`git rm -r` when tracked). Remove the manifest entry. `bin/link`, `bin/link check`.
-
-**review weekly** and **review monthly.** Follow [references/review.md](references/review.md). Weekly writes `usage.yaml`, runs `workflow-from-chats` for the candidates from conversations, reads own skills and both instruction files together for contradictions, and writes the short message `reports/<date>/review.md` with the raw data files and proposal diffs beside it; monthly adds a research refresh from [references/research-prompts.md](references/research-prompts.md), a compliance pass over every own skill and `global/AGENTS.md`, and the consistency read widened to vendor skills.
+- **Adopting** a vendor skill turns it into an own one under `skills/<same name>`: [references/adopt.md](references/adopt.md).
+- **Retiring**: vendor with `bin/unvendor`, own with `git rm -r skills/<name>` (or deleting `private/<name>`), then the manifest entry goes and the projections are rebuilt.
+- **The weekly or monthly review**: [references/review.md](references/review.md).
