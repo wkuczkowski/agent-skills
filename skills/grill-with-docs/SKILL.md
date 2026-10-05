@@ -14,4 +14,4 @@ Two skills in this collection together: `grilling` for the interview and `domain
 
 The documents follow `domain-modeling`: `GLOSSARY.md` and `docs/adr/` at the repo root, created when the first term or decision is settled. No other setup is needed; the `docs/agents/` files that `setup-matt-pocock-skills` writes serve issue-tracker and triage skills this collection no longer has.
 
-Writing a term into the glossary or a decision into an ADR is not a question for the user: the agent writes it as the grilling settles it and mentions it in the round's decided list. The user's instructions take precedence over this skill.
+Glossary entries record what the user means by his terms, taken from his answers during the grilling; writing one or an ADR is not a question for him, and each appears in the round's decided list so he can correct it. The user's instructions take precedence over this skill.

@@ -18,7 +18,8 @@ npx skills add wkuczkowski/agent-skills -g -a '*'
 - **orchestrate** — user-invoked: run the main agent as an orchestrator that protects its own context and delegates reading, building, testing, research and the review of delivered work to subagents.
 - **pausing-work** — user-invoked: bring running work to a safe stop within the time given, stop background tasks, and leave a handoff file (and a new-session prompt when asked).
 - **grilling** — user-invoked: stress-test a plan, putting to the user only the decisions that are his (preference, scope, cost, direction) and settling technical ones itself, listed so he can override. Adopted from [mattpocock/skills](https://github.com/mattpocock/skills).
-- **grill-with-docs** — user-invoked: `grilling` plus a glossary and ADRs written as decisions settle, through the vendor `domain-modeling` skill; works in Codex too. Adopted from mattpocock/skills.
+- **grill-with-docs** — user-invoked: `grilling` plus a glossary and ADRs written as decisions settle, through `domain-modeling`; works in Codex too. Adopted from mattpocock/skills.
+- **domain-modeling** — keeps a project's `GLOSSARY.md` in the user's own meaning of his terms (an agent can read what the code calls things; what he means is what a new session cannot guess) and records hard-to-reverse decisions as ADRs. Adopted from mattpocock/skills.
 - **unslop** — user-invoked: cut AI tells from writing. Copy of [cursor/plugins](https://github.com/cursor/plugins) pstack/skills/unslop, kept under evaluation.
 
 ### Machine hygiene
