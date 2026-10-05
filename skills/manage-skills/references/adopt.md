@@ -21,4 +21,4 @@ The order matters here, since `bin/upstream` parses the manifest form exactly an
    ```
 
 3. `bin/unvendor <name>`, then `bin/link` and `bin/link check` (0 findings), and `bin/upstream` lists the skill as `own`, `unchanged`.
-4. The rest of "A skill is done when" in `writing-for-agents`, including the test in both harnesses.
+4. The rest of "A skill here is done when" in `SKILL.md`, including the test in both harnesses.
