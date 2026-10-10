@@ -20,7 +20,7 @@ Do not use `--ephemeral` for a session that must be resumed. Get its id from the
 
 `resume` accepts neither `--sandbox` nor `-C`, and it does not inherit them from the original run: a session started with `--sandbox read-only` resumed as the `config.toml` default, `workspace-write`. On every resume pass `-c sandbox_mode=<mode>` and run the command from the original working directory. Check the result in the rollout's `turn_context` records (SKILL.md, Output and completion).
 
-`--last` takes the most recent session on the machine; under parallel runs that is someone else's, so resume by id.
+`--last` takes the most recent session (filtered to the current directory unless `--all`, per `--help` on 0.162.1); under parallel runs that is someone else's, so resume by id.
 
 ## Background runs
 

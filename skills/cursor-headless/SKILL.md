@@ -1,11 +1,11 @@
 ---
 name: cursor-headless
-description: Use when you need the Grok model available through Cursor and are working outside the Cursor harness. Runs Cursor Agent headlessly with Grok 4.6 High, in normal or Fast mode depending on the task.
+description: Use when you need the Grok model available through Cursor and are working outside the Cursor harness. Runs Cursor Agent headlessly with Grok 4.7 High, in normal or Fast mode depending on the task.
 ---
 
 # Cursor headless (`cursor-agent -p`)
 
-Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.18-9a7762b`; the measurements behind them are in the agent-skills repo under `research/cursor-headless-empirical-2026-09-20.md`.
+Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.18-9a7762b`, re-checked against 2026.10.01 on 2026-10-10; the measurements behind them are in the agent-skills repo under `research/cursor-headless-empirical-2026-09-20.md`.
 
 ## Choose a run
 
@@ -14,7 +14,7 @@ Use this for a one-shot task:
 ```bash
 sid=$(cursor-agent create-chat)
 timeout -k 15 3600 cursor-agent -p --trust --auto-review --sandbox disabled \
-  --workspace "$PWD" --model cursor-grok-4.6-high --resume "$sid" \
+  --workspace "$PWD" --model grok-4.7-high --resume "$sid" \
   --output-format stream-json < prompt.txt >events.jsonl 2>err.log
 ```
 
@@ -35,7 +35,7 @@ If the CLI itself fails, hangs, selects the wrong model, emits malformed output,
 
 A killed run loses every in-flight tool call and all in-flight subagent work, so arrange for the run to end on its own.
 
-- The `timeout` is a guard against a hung process, not a schedule. Measured on Grok 4.6 High: a focused question 1–3 minutes, web or repository research 3–8 minutes, a broad task with subagents 8–15 minutes and more. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
+- The `timeout` is a guard against a hung process, not a schedule. Measured on Grok 4.6 High (2026-09-20; 4.7 not yet measured): a focused question 1–3 minutes, web or repository research 3–8 minutes, a broad task with subagents 8–15 minutes and more. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
 - When a deadline exists, put it in the prompt rather than in the `timeout`. This wording made the agent finish early with a normal `result` and a list of gaps:
 
   > Time budget: 10 minutes of wall-clock time from your first action. Run `date +%s` first and again after every few tool calls. When 8 minutes have passed, stop exploring and deliver the report with what you have, listing the areas you did not reach under a heading "Not covered".
@@ -61,7 +61,7 @@ A killed run loses every in-flight tool call and all in-flight subagent work, so
 
 ## Model
 
-Two slugs, same model and effort: `cursor-grok-4.6-high` (normal) and `cursor-grok-4.6-high-fast` (Fast, quicker output). Pick per run. Fast fits when a quicker answer helps: you or the user are waiting on the result, the run is one step in an interactive loop, or it is a smoke check. Normal fits background and batch work where nobody is blocked on the answer. The user's choice of mode takes precedence.
+Two slugs, same model and effort: `grok-4.7-high` (normal) and `grok-4.7-high-fast` (Fast, quicker output); the user chose Grok 4.7 on 2026-10-10. The 4.7 slugs have no `cursor-` prefix, and their Fast display names contain zero-width spaces, so compare slugs, not display text. Pick per run. Before 2026.09.28 `--model` silently ran the shorter base slug when the chosen one started with another slug, so Fast runs measured earlier may have been normal ones; confirm `system/init.model`. Fast fits when a quicker answer helps: you or the user are waiting on the result, the run is one step in an interactive loop, or it is a smoke check. Normal fits background and batch work where nobody is blocked on the answer. The user's choice of mode takes precedence.
 
 `cursor-agent models` lists valid slugs for the account. The `system/init` event confirms the resolved display name.
 
