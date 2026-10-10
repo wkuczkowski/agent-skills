@@ -8,7 +8,7 @@ Every run in SKILL.md already starts from `sid=$(cursor-agent create-chat)`. A f
 
 ```bash
 cursor-agent -p --trust --auto-review --sandbox disabled \
-  --model cursor-grok-4.6-high --resume "$sid" \
+  --model grok-4.7-high --resume "$sid" \
   --output-format stream-json < followup.txt >events-2.jsonl 2>err-2.log
 ```
 
@@ -42,7 +42,7 @@ Launch mass parallel runs from an external runner: a bash or Python script that 
 ```bash
 sid=$(cursor-agent create-chat); echo "$sid" > "$run_dir/$name.sid"
 nohup timeout -k 15 3600 cursor-agent -p --trust --auto-review --sandbox disabled \
-  --workspace "$PWD" --model cursor-grok-4.6-high --resume "$sid" --output-format stream-json \
+  --workspace "$PWD" --model grok-4.7-high --resume "$sid" --output-format stream-json \
   < "$run_dir/$name.prompt" > "$run_dir/$name.jsonl" 2> "$run_dir/$name.err" &
 ```
 

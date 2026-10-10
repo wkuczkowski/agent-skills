@@ -36,9 +36,10 @@ timeout -s INT -k 30 3600 agy --model <slug> --output-format json \
 
 Print mode never prompts. Reading and writing files inside the workspace and `search_web` run without approval; shell commands (`command`) and fetching a page (`read_url`) are denied unless `permissions.allow` in `~/.gemini/antigravity-cli/settings.json` has a matching rule (`command(git diff)`, `read_url(go.dev)`, `read_file(...)`, `write_file(...)`; deny beats ask beats allow). So:
 
-- Say in the prompt what the run may not do ("do not run shell commands or open URLs; answer from search results and the files"), or the model reaches for a command and the run ends empty.
+- The user wants agy runs to execute commands, through allow rules rather than the bypass flag (decided 2026-10-10). `agy -p "/permissions"` lists the rules in force; a command outside them still ends the run, so name what the run may not do in the prompt ("no network, no installs"), or the model reaches for it and the run ends empty. The rules are prefix matches and not isolation: `python3` or `npm run` can do anything the user can.
+- Changing the rules is the user's call; Claude Code's auto mode blocks an agent from editing that file.
 - `toolPermission: "proceed-in-sandbox"` with `--sandbox` still denied commands in `-p` (tested 2026-10-10).
-- `--dangerously-skip-permissions` approves everything, and Claude Code's auto mode blocked launching it (2026-10-10). Adding allow rules changes the user's global config; both are his decision.
+- `--dangerously-skip-permissions` approves everything; Claude Code's auto mode blocked launching it (2026-10-10).
 
 ## Context the run sees
 
