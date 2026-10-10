@@ -5,7 +5,7 @@ description: Use when you need the Grok model available through Cursor and are w
 
 # Cursor headless (`cursor-agent -p`)
 
-Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.18-9a7762b`; the measurements behind them are in the agent-skills repo under `research/cursor-headless-empirical-2026-09-20.md`.
+Drive Cursor Agent CLI non-interactively. These instructions target `cursor-agent 2026.09.18-9a7762b`, re-checked against 2026.10.01 on 2026-10-10; the measurements behind them are in the agent-skills repo under `research/cursor-headless-empirical-2026-09-20.md`.
 
 ## Choose a run
 
@@ -61,7 +61,7 @@ A killed run loses every in-flight tool call and all in-flight subagent work, so
 
 ## Model
 
-Two slugs, same model and effort: `cursor-grok-4.6-high` (normal) and `cursor-grok-4.6-high-fast` (Fast, quicker output). Pick per run. Fast fits when a quicker answer helps: you or the user are waiting on the result, the run is one step in an interactive loop, or it is a smoke check. Normal fits background and batch work where nobody is blocked on the answer. The user's choice of mode takes precedence.
+Two slugs, same model and effort: `cursor-grok-4.6-high` (normal) and `cursor-grok-4.6-high-fast` (Fast, quicker output). Pick per run. Before 2026.09.28 `--model` silently ran the shorter base slug when the chosen one started with another slug, so Fast runs measured earlier may have been normal ones; confirm `system/init.model`. Fast fits when a quicker answer helps: you or the user are waiting on the result, the run is one step in an interactive loop, or it is a smoke check. Normal fits background and batch work where nobody is blocked on the answer. The user's choice of mode takes precedence.
 
 `cursor-agent models` lists valid slugs for the account. The `system/init` event confirms the resolved display name.
 

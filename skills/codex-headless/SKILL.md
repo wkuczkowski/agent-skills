@@ -5,7 +5,7 @@ description: Use when you need an OpenAI model and are working outside the Codex
 
 # Codex headless (`codex exec`)
 
-Drive OpenAI Codex CLI non-interactively. These instructions target `codex-cli 0.155.1` (0.159.2 installed on 2026-09-30); the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
+Drive OpenAI Codex CLI non-interactively. These instructions target `codex-cli 0.155.1`, re-checked against the 0.162.1 release notes on 2026-10-10; the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
 
 ## Auto-review invariant
 
@@ -72,7 +72,7 @@ A killed run loses its in-flight commands and all subagent work, so arrange for 
 
 ## Model and effort
 
-The user names the model and effort in the chat; without that, `~/.codex/config.toml` holds the default. Pass `-m` and `-c model_reasoning_effort=` explicitly on every invocation, including resumed sessions, since JSONL does not show which model ran. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request (0.157.0 rejected `gpt-6.1-sol` for ChatGPT accounts, 0.159.2 accepts it).
+The user names the model and effort in the chat; without that, `~/.codex/config.toml` holds the default. Pass `-m` and `-c model_reasoning_effort=` explicitly on every invocation, including resumed sessions, since JSONL does not show which model ran. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request. Since 0.161.0 the built-in default is `gpt-6.1-sol`.
 
 ## Clean runs
 
