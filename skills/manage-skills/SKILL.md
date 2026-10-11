@@ -15,12 +15,12 @@ The collection lives in `/home/wkuczkowski/projects/TOOLS/skills` (below: the re
 - Vendor skills under `.agents/skills/` are verbatim copies that `npx skills update` overwrites. A vendor skill is added with `npx skills add <owner/repo> -a codex -y -s <name>` and a manifest entry `kind: vendor`, `upstream: <source> <skillPath>` copied from `skills-lock.json`.
 - `skills/` is public on GitHub, `private/` stays on this machine; `.gitignore` is a whitelist.
 - The user browses the collection on a private Artifact page, https://claude.ai/artifact/DKsxYM2rxYmuYjbqbMcZak, a snapshot that does not update itself. `bin/catalog` writes `reports/skills-catalog.html`, which Claude Code republishes to that URL after a change to skills, the manifest or `global/AGENTS.md`; Codex and headless runs cannot publish and say so. The page embeds `global/AGENTS.md`, so it stays out of git and is never shared publicly.
+- `global/AGENTS.md` is symlinked into both harnesses, so an edit is live at once, and it is not in git, so nothing records the previous version; a copy taken before the edit is the only way back.
 
 ## Lessons
 
 - `npx skills remove` also deletes `skills/<name>` when an own directory of that name exists (2026-09-06). A vendor skill leaves through `bin/unvendor <name>`, which removes only `.agents/skills/<name>` and its lock entry.
 - `npx skills check` reinstalls vendor skills as a side effect (2026-10-05); `bin/upstream` reports changes without touching anything.
-- Retiring a skill, deleting files and changing skill content are the user's decisions; a review proposes and does not apply.
 
 ## A skill here is done when
 

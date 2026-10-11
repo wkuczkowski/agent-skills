@@ -4,7 +4,7 @@ Adoption turns `.agents/skills/<name>` (vendor, verbatim, tracked by `npx skills
 
 ## The rewrite
 
-The agent drafts the rewrite itself from the vendor skill, its usage (`usage.yaml`, `bin/usage`), what upstream changed (`bin/upstream --diff <name>`), and what the user's sessions show about how he uses it, following `writing-for-agents`. It puts to him only the decisions that are his, such as what the skill should be for and anything his sessions do not settle, and writes after his go-ahead. On 2026-10-05 `domain-modeling` was adopted this way with one clarification from him (the glossary records what he means by his terms, not what the agent decides they mean). Until then adoption ran a three-round interview, and most answers accepted the recommendation.
+The agent drafts the rewrite itself from the vendor skill, its usage (`usage.yaml`, `bin/usage`), what upstream changed (`bin/upstream --diff <name>`), and what the user's sessions show about how he uses it, following `writing-for-agents`. It puts to him only the decisions that are his, such as what the skill should be for and anything his sessions do not settle, and writes after his go-ahead. On 2026-10-05 `domain-modeling` was adopted this way with one clarification from him (the glossary records what he means by his terms, not what the agent decides they mean).
 
 ## Mechanics
 
