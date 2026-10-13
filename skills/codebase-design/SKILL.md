@@ -9,7 +9,7 @@ metadata:
 
 # Codebase design
 
-Two terms other skills here rely on, and the design preferences behind them.
+Two terms for talking about module design, and the design preferences behind them.
 
 **Deep module**: a module whose interface is small next to the behaviour behind it, so a caller learns little and gets a lot. Interface means everything a caller has to know — signature, invariants, ordering, error modes, required configuration, performance — not just the type surface.
 

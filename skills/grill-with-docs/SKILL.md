@@ -10,7 +10,7 @@ metadata:
 
 # Grill with docs
 
-Two skills in this collection together: `grilling` for the interview and `domain-modeling` for the documents. Read both SKILL.md files before the first round; they are in the harness's skill list and under `~/.claude/skills/<name>/` and `~/.agents/skills/<name>/`. Until 2026-10-05 this skill only said to call the Skill tool, which Codex does not have; of three Codex sessions on 2026-09-14, one loaded both skills, one only `domain-modeling`, and one neither and skipped the interview.
+Two skills in this collection together: `grilling` for the interview and `domain-modeling` for the documents. Read both SKILL.md files before the first round. They sit next to this skill's directory, as `../grilling/SKILL.md` and `../domain-modeling/SKILL.md`; `grilling` is user-invoked, so a Codex skill list does not show it, and a setup that cannot read `~/.agents` (such as a confined Codex profile) finds neither under `~/.agents/skills`. Until 2026-10-05 this skill only said to call the Skill tool, which Codex does not have; of three Codex sessions on 2026-09-14, one loaded both skills, one only `domain-modeling`, and one neither and skipped the interview.
 
 The documents follow `domain-modeling`: `GLOSSARY.md` and `docs/adr/` at the repo root, created when the first term or decision is settled. No other setup is needed; the `docs/agents/` files that `setup-matt-pocock-skills` writes serve issue-tracker and triage skills this collection no longer has.
 
