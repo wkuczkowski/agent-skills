@@ -10,7 +10,7 @@ metadata:
 
 # Workflow from chats
 
-Finds what the user corrected, repeated or asked for in his Codex and Claude Code conversations since the last run, and turns what recurs into proposals: a new skill, an edit to a skill, or a change to `global/AGENTS.md`. Each proposal is checked against what already exists (`manifest.yaml`, the skills' descriptions, `global/AGENTS.md`, the harness built-ins under `system/`), so a match becomes an edit or is dropped. The repo is `/home/wkuczkowski/projects/TOOLS/skills`. The user's instructions take precedence over this skill.
+Finds what the user corrected, repeated or asked for in his Codex and Claude Code conversations since the last run, and turns what recurs into proposals: a new skill, an edit to a skill, or a change to the global instructions (`global/src/`, rebuilt by `bin/global`). Each proposal is checked against what already exists (`manifest.yaml`, the skills' descriptions, `global/AGENTS.md`, the harness built-ins under `system/`), so a match becomes an edit or is dropped. The repo is `/home/wkuczkowski/projects/TOOLS/skills`. The user's instructions take precedence over this skill.
 
 The run is done when he has a reply in the chat, in his language, that lets him decide on each proposal easily, and the agent that later applies his answers has what it needs (evidence and the exact wording or diff per proposal) in `reports/<date>/conversations.md`. He practically never reads a long report; a 111 KiB HTML report on 2026-09-30 went unread. Nothing outside `reports/` changes until he answers.
 
