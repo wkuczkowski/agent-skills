@@ -4,6 +4,7 @@ The review runs when the user asks for it, weekly or monthly. It tells him what 
 
 ## Facts
 
+- The review runs on the development machine, which holds most of the transcripts; `usage.yaml` is shared through the private repo, and `bin/usage --write` elsewhere would replace it with one machine's counts. Use that happens only on the client-data machine, or in Codex azure-eu (whose transcripts Claude may not read), does not show in that count, so a skill that matters mainly there gets `keep: true`.
 - Retirement candidates: six weeks without invocation for a model-invocable skill, twelve for a user-only one, `keep: true` exempt (`bin/usage --unused`). `bin/usage` counts reading a `SKILL.md` as use, so a skill whose only Codex use falls on days of work on this repo may be unused.
 - `bin/upstream --json` exits 1 when a skill changed and `bin/link check` exits 1 when there are findings; both are results, not errors.
 - Conversation candidates come from the `workflow-from-chats` skill. It is user-only, so the review follows it by reading its `SKILL.md`, not through the Skill tool.

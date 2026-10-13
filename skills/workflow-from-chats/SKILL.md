@@ -16,7 +16,7 @@ The run is done when he has a reply in the chat, in his language, that lets him 
 
 ## Window
 
-From the timestamp in `reports/.workflow-from-chats-last-run`, or `--since` when the prompt gives one, or seven days back when neither exists, to the start of this run; the start of this run is written to that file once the reply is ready. Sessions created earlier can hold turns inside the window.
+Transcripts are per machine and `reports/` is shared through the private repo, so each machine keeps its own stamp: `reports/.workflow-from-chats-last-run` on the development machine, `reports/.workflow-from-chats-last-run-client-machine` on the client-data machine. The window runs from the timestamp in this machine's stamp, or `--since` when the prompt gives one, or seven days back when neither exists, to the start of this run; the start of this run is written to that file once the reply is ready. Sessions created earlier can hold turns inside the window.
 
 ## What has mattered in past runs
 
@@ -27,4 +27,4 @@ From the timestamp in `reports/.workflow-from-chats-last-run`, or `--since` when
 
 ## Data
 
-Transcripts hold the user's and employees' data. Proposals and the working file quote only the short excerpts a proposal needs, without credentials or personal identifiers. Material that looks like law-firm client data is set aside and named as excluded. Transcripts are read, never edited; scratch copies go to a temporary directory outside the repo.
+Transcripts hold the user's and employees' data. Proposals and the working file quote only the short excerpts a proposal needs, without credentials or personal identifiers. Material that looks like law-firm client data is set aside and named as excluded. On the client-data machine only `~/.claude` and `~/.codex` are read; the Codex azure-eu history in `~/.codex-azure-eu` is off limits and blocked, which is not a coverage gap to work around, and client data found in a readable transcript is reported to the user at once, per the global instructions. Transcripts are read, never edited; scratch copies go to a temporary directory outside the repo.
