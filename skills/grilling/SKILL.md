@@ -4,7 +4,7 @@ description: Stress-tests a plan, decision or idea with the user, putting to him
 disable-model-invocation: true
 metadata:
   upstream: mattpocock/skills skills/productivity/grilling
-  upstream-commit: "85f83d3fde1d3a90d5c9a657f6998c79a6c37308"
+  upstream-commit: "49dd158d1076134a641b33efb035946536778336"
   adopted: "2026-10-05"
 ---
 
@@ -27,6 +27,6 @@ The aim is a plan the user and the agent understand the same way, with every bra
 
 ## Asking
 
-The aim of each round is that his decisions are easy to make and that he can see, and override, what was decided for him. How the questions are put is the agent's and the harness's call. Two observations from the record: he has decided fastest when a question carried a recommendation with its reason, and he answers in his own language. A question that depends on another still open waits for its answer, and a better route the agent sees is worth raising at any point.
+The aim of each round is that his decisions are easy to make and that he can see, and override, what was decided for him. How the questions are put is the agent's and the harness's call. Two observations from the record: he has decided fastest when a question carried a recommendation with its reason, and he answers in his own language. A question worded so that his "tak" accepts the recommendation lets him wave it through in one word. A question that depends on another still open waits for its answer, and a better route the agent sees is worth raising at any point.
 
 The session ends when no decision of his is open. A short summary of what was decided, by whom, closes it, and the work waits for his go-ahead. The user's instructions take precedence over this skill: when he says to decide on your own, that covers the rest of the session.
