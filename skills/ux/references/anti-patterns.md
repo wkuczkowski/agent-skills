@@ -41,3 +41,9 @@ The final check for any build. A design that matches an entry is wrong regardles
 **A decorative hero above a paywall or product page** — beautiful illustration, no information. It does not answer "what am I getting?", and users cannot commit to something they cannot visualise. → Show the real product, and ship an image set rather than one better hero (`product-pages.md`).
 
 **Copying a competitor's checkout** — "this is how Amazon does it". 64% of desktop, 63% of mobile and 46% of app checkouts rate mediocre or worse in Baymard's benchmark; **zero** reach state-of-the-art, so the modal competitor is failing. → Check against explicit guidelines, not observed practice.
+
+**Labels and meta lines that restate what the reader already knows** — an eyebrow above the headline, "GUIDE · STATE OF KNOWLEDGE: <date>", a shop-name note on every item. The user cut these in two sessions after critics had passed the page (2026-10-02, 10-08). → Delete them; the headline and the content carry it.
+
+**Decorative display fonts and texture backgrounds** — a heavily stylised display face, a grid or graph-paper pattern behind the content. Both cost legibility, and the user rejected both on pages critics had scored well (2026-10-02, 10-08). → Plain readable type; a quiet background.
+
+**Motion that was asked for but cannot be seen** — "subtle" animations that on the running page read as none. The user asked for animations, got them in code, and saw nothing on the dev server (2026-10-02). → Look at the running page on desktop and mobile; if the motion is not noticeable there, it is not done.

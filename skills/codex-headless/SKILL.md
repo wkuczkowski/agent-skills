@@ -35,6 +35,7 @@ timeout -k 15 3600 codex exec --ephemeral --json --skip-git-repo-check \
 - Use `-C <dir>` to set the working root.
 - For resumable or long-running work, read [sessions and monitoring](references/sessions-and-monitoring.md).
 - For MCP, read [MCP servers](references/mcp.md) before constructing the command.
+- What went wrong in the user's real runs (hangs, lost output, refusals, quota), dated with the CLI version: [observed in use](references/observed-in-use.md).
 
 `codex exec` still writes client state under `CODEX_HOME` when `--ephemeral` is set. If a parent sandbox blocks startup before the first JSONL event, allow the outer process to write there. Keep the invoked Codex process on its requested sandbox and Auto-review settings.
 
