@@ -13,16 +13,18 @@ metadata:
 
 The models these files are written for are capable and change every few weeks. A line earns its place when removing it would change what an agent decides:
 
-- **Facts the agent cannot find on its own**: paths, commands, URLs, how the machine and the project are set up. Dated, with what they were checked against.
+- **Facts the agent cannot find on its own**: paths, commands, URLs, how the machine and the project are set up. Dated, with what they were checked against. Anthropic's test (Claude Code best practices, 2026-11): could the agent find it by reading the code, and would it actually go and look? If both, leave it out.
 - **Lessons from what went wrong**, dated. A lesson ages slowly and does not narrow the agent's options.
 - **What the user dislikes or has rejected.** What he likes is riskier to write down: an agent may stop there instead of proposing something better.
 - **The goal and what done looks like**, not the steps; the method is the agent's. Steps stay only where a wrong order breaks something.
 
-How the agent talks to the user (questions, reports) is left to the model and the harness. Imperatives sit only where a wrong guess costs data, security, an irreversible action or a decision the user made. A skill that could conflict with the user's request says his instructions take precedence; without that line, GPT-6 Astra stalled on such skills (2026-09).
+How the agent talks to the user (questions, reports) is left to the model and the harness. Imperatives sit only where a wrong guess costs data, security, an irreversible action or a decision the user made. A skill that could conflict with the user's request says his instructions take precedence; without that line, GPT-6 Astra stalled on such skills (2026-09). Since Codex 0.16x the base prompt itself ranks the user above skills and proceeds unless a skill explicitly requires approval, so an approval the user does want is stated outright, not implied (2026-11).
+
+How hard a model thinks is set by its effort level, not by wording: "think hard" or "be thorough" in a skill does little on the Claude 5.5 models and GPT-6.1. A skill never asks for the model's reasoning, a scratchpad or a running log of its thinking in the output; on Claude that can trigger a `reasoning_extraction` refusal. Asking for evidence or a summary of what was done is fine (vendor guides, 2026-11; `research/claude-5.5-instructions-2026-11-07.md`).
 
 ## Instruction files
 
-The user keeps one `AGENTS.md` per project and no `CLAUDE.md` (settled 2026-09-22, restated 2026-10-05): Claude Code loads `AGENTS.md` where a directory has no `CLAUDE.md` (2.1.285), and Codex reads `AGENTS.md` from the repo root down to the working directory, 32 KiB combined.
+The user keeps one `AGENTS.md` per project and no `CLAUDE.md` (settled 2026-09-22, restated 2026-10-05): Claude Code loads `AGENTS.md` where neither the directory nor any parent has a `CLAUDE.md` or `CLAUDE.local.md` (since 2.1.277; `~/.claude/CLAUDE.md` does not count, a project `CLAUDE.local.md` turns it off), and Codex reads `AGENTS.md` from the repo root down to the working directory, 32 KiB combined.
 
 ## Skills: what the harnesses decide
 
