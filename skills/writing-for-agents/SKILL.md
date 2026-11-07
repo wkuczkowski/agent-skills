@@ -26,6 +26,8 @@ How hard a model thinks is set by its effort level, not by wording: "think hard"
 
 The user keeps one `AGENTS.md` per project and no `CLAUDE.md` (settled 2026-09-22, restated 2026-10-05): Claude Code loads `AGENTS.md` where neither the directory nor any parent has a `CLAUDE.md` or `CLAUDE.local.md` (since 2.1.277; `~/.claude/CLAUDE.md` does not count, a project `CLAUDE.local.md` turns it off), and Codex reads `AGENTS.md` from the repo root down to the working directory, 32 KiB combined.
 
+The global file holds what sessions across the machine need; setup of one tool, connector or project goes to that project or `~/projects/troubleshooting` (user, 2026-11-02: "nie w globalnym AGENTS.md").
+
 ## Skills: what the harnesses decide
 
 - The description decides whether a skill fires. On 2026-10-05 `domain-modeling` did not fire in Claude Code until its description named the situation the user was in ("explains what he means by a word"). Every description sits in context on every turn, and the Codex catalog caps all of them together at about 8,000 characters.
