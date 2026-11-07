@@ -1,52 +1,52 @@
 # Sessions and monitoring
 
-## Launch with an owner and a record
+Checked against Claude Code 2.1.316 and https://code.claude.com/docs/en/headless on 2026-11-07.
 
-For coding work, use a persisted conversation and `--output-format stream-json --verbose`. Use a unique private run directory for the prompt, events, stderr, and exit status. Record the working directory, selected model/effort, launch time, calling tool's handle, Claude PID/start identity when available, and Claude conversation ID from `system/init` or the final result. These identifiers are different.
+## Launch with a record
 
-Keep the calling tool attached to a supervised process and retain its handle when it yields. A bare trailing `&` without a wait/exit record loses useful supervision. If a shell wrapper is needed, have it record the child PID and wait for that child before writing its exit status. A missing exit file means unknown, not success. Confirm the record belongs to the current run; reused log or exit files can describe an earlier process.
+For coding work use a persisted conversation and `--output-format stream-json --verbose`, in a private per-run directory. `--session-id <uuid>` fixes the conversation ID before the run starts, so a kill seconds after launch cannot lose it, and `--resume <id>` finds it from any directory. The conversation ID, the Claude PID and the calling tool's process handle are three different things; record all three, plus the working directory, model and effort.
 
 ```bash
-# Run in the intended repository. Prepare a private run_dir and prompt.txt first.
+# In the intended repository, with a private run_dir holding prompt.txt.
 session_id=$(cat /proc/sys/kernel/random/uuid); printf '%s\n' "$session_id" > "$run_dir/session-id"
 CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 timeout -s INT -k 30 3600 claude -p \
   --model <model> --effort <effort> --session-id "$session_id" \
   --permission-mode auto --permission-prompts none \
   --strict-mcp-config --output-format stream-json --verbose \
   < "$run_dir/prompt.txt" > "$run_dir/events.jsonl" 2> "$run_dir/stderr.log" &
-claude_pid=$!
-printf '%s\n' "$claude_pid" > "$run_dir/pid"
+claude_pid=$!; printf '%s\n' "$claude_pid" > "$run_dir/pid"
 if wait "$claude_pid"; then run_exit=0; else run_exit=$?; fi
 printf '%s\n' "$run_exit" > "$run_dir/exit-code"
-exit "$run_exit"
 ```
 
-## A silent kill of background tasks
+A bare trailing `&` with no wait and exit record loses the exit status; a missing exit file means unknown, not success, and a reused run directory can describe an earlier process.
 
-Print mode waits a ceiling of 600 s for background tasks once the main agent ends its turn, then terminates them and exits `0` with `subtype: success, terminal_reason: completed`. The only trace is a stderr line: `Background tasks still running after 600s; terminating. Set CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 to wait indefinitely.` This hits orchestrations where the main agent spawns subagents with the Agent tool and ends its turn while they run (observed 2026-09-18 on 2.1.274: 28 min run, five subagents killed, result record clean). The [headless documentation](https://code.claude.com/docs/en/headless) describes the variable and the 10-minute idle wait; by 2026-10-10 (2.1.296) it says background subagents keep a `-p` run open and the cap only ends idle waiting, and the stderr line reads `Background tasks still running <N> after the last turn (<duration>); stopping them.` Since 2.1.292 one-shot runs also wait for background Bash commands, which stop at their own time limit (default 30 min). Set it to `0` for any run expected to background work, and grep stderr for `Background tasks still running` before reporting completion.
+## Background work at the end of a run
 
-The outer execution tool must allow the intended task duration. Its yield interval is not necessarily a kill timeout. Track outer task deadlines separately from Claude Bash-tool timeouts. `--max-turns` and `--max-budget-usd` do not establish a wall-clock deadline; check supported flags in the installed CLI before using them.
+After the main agent ends its turn, a `-p` run stays open for background work. The docs say: a background command the main conversation started keeps the run open until it exits or hits its own time limit (default 30 min); background subagents and workflows keep it open until they complete; everything else is stopped after `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS` of idle waiting (default 10 minutes), dropping its partial result. On 2.1.316 a busy background subagent was stopped at the ceiling anyway, with a clean result ([observed in use](observed-in-use.md)). So set the variable to `0` for any run that may background work, and before reporting completion check stderr for `Background tasks still running` (the line names what was stopped) and `subagent_stats` in the final result. `--max-budget-usd` also stops remaining background work when reached.
 
-For a supervised task that does not need Claude-managed background work, consider process-local `CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1`. It disables background Bash/subagent tools and automatic backgrounding, but not shell `&`. It is an optional simplification, not a proven fix for unexpected SIGTERM. Leave global settings unchanged. [Official variable reference](https://code.claude.com/docs/en/env-vars).
+`CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1` (process-local) turns off background Bash, background subagents and automatic backgrounding, but not shell `&`. `--bare` does the same and more, but also drops subscription login (SKILL.md).
 
-## Monitor without confusing activity and completion
+Subagents run at the session's effort unless the Agent call names one or `CLAUDE_CODE_SUBAGENT_EFFORT` is set (2.1.316). Since 2.1.302 a subagent's own Agent calls run in the foreground by default in `-p`, and fork subagents are on (`CLAUDE_CODE_FORK_SUBAGENT=0` turns them off).
 
-Read new events since the previous offset, not the entire transcript repeatedly. Subagent messages carry `parent_tool_use_id`; `system/task_started`, `task_progress` and `task_notification` events track each subagent, and `--forward-subagent-text` adds their text. Summarize the latest completed step, current tool, and blocker. Tool activity, file changes, or a quiet log can inform diagnosis but cannot establish process termination. Check run status from SKILL.md when the terminal result and actual exit arrive; assess the saved artifact separately.
+`--max-turns` and `--max-budget-usd` are not wall-clock deadlines. The outer execution tool's yield interval is not necessarily a kill timeout; track the outer deadline separately from Claude's own Bash-tool timeouts.
 
-Before declaring a run dead, establish what process namespace the observation sees. In Codex, a sandbox `/proc` may omit host processes. Prefer the original execution handle and its wait result; otherwise correlate a permitted host observation with the recorded PID/start identity, exact log descriptors, or supervisor record. A log descriptor can be inherited by a non-Claude child; confirm executable, start identity, and parentage before treating it as the writer. Session files and log timestamps provide context, not independent proof of liveness or death. Request the specific missing access if required, rather than treating an empty listing as proof.
+## Monitor
 
-## Resume only after termination is confirmed
+Read new events since the previous offset. Events carry `timestamp`. Subagent messages carry `parent_tool_use_id`; `system/task_started`, `task_progress`, `task_notification` and `background_tasks_changed` track background work, `--forward-subagent-text` adds subagent text, `system/api_retry` marks retries and `permission_denied` marks denials. Tool activity, file changes or a quiet log inform diagnosis but do not establish that the process ended.
 
-Use an explicit recorded Claude session ID with `--resume`; `--session-id <uuid>` at launch fixes the ID before the run starts, so a kill cannot lose it, and `--resume` finds it from any directory. `--continue` selects the latest conversation in the working directory and can select another task. Retain the selected model and permission flags unless the user changes them; choose medium or high for the follow-up using the complexity rule in SKILL.md; use new output files for each turn. `--no-session-persistence` prevents resumption. If persistence was disabled or no usable session exists, start a fresh conversation only after confirming exit, with a checkpoint of verified files and remaining work.
+Before declaring a run dead, establish what process namespace the observation sees: in Codex a sandbox `/proc` may omit host processes. Prefer the original execution handle and its wait result; otherwise correlate a permitted host observation with the recorded PID, its start time and parentage. A log descriptor can be inherited by a non-Claude child. Session files and log timestamps are context, not proof of liveness or death.
 
-After a background-task kill or a killed process, resume the same session with the ceiling lifted and a short technical message stating what happened: the process ended, the ceiling that caused it, which subagents were killed. The agent keeps its context and re-reaches its subagents with SendMessage from their saved transcripts (measured after a hard kill at 100 s: all four subagents resumed); do not re-specify the task.
+## Resume only after the old process has exited
+
+Resume by the recorded ID with `--resume`; `--continue` takes the latest conversation in the working directory and can pick another task, and `--no-session-persistence` makes resuming impossible. Keep the model, effort and permission flags unless the user changes them, and write each turn to new output files.
+
+On resume the interrupted turn is left as it is and the new prompt drives the conversation (`CLAUDE_CODE_RESUME_INTERRUPTED_TURN=1` continues the turn instead). So after a kill, resume with the ceiling lifted and a short message saying what happened: the process ended, why, which subagents were stopped. The agent keeps its context and can re-reach saved subagents with SendMessage; the task need not be restated.
 
 ```bash
 CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p --resume "$session_id" ...
 ```
 
-Never start a second writer merely because monitoring is uncertain. Confirm the old writer has exited; if authorized to stop it, identify that exact process, stop it, wait for exit, and check its owned test children before resuming. Avoid broad process-name kills. If several orchestrators can launch work, use a shared ownership record or lock.
+One writer per overlapping file set, and one orchestrator launches and resumes each run; an observer may read logs but does not launch a replacement. A second writer started because monitoring is uncertain races the first. To stop a writer, identify that exact process (no process-name kills), stop it, wait for its exit and its test children. A correction brief goes to the same persisted session after its process has exited. A message written to an inbox file reaches the agent only if its prompt said when to read it.
 
-Interrupted runs can leave useful edits. Inspect those files and recorded checks, then resume with a bounded remaining task. A frozen snapshot helps review an interrupted candidate without racing a live writer.
-
-Native `claude --bg` is a separate lifecycle from `claude -p`. Its `agents/logs/attach/stop` handles are not print-mode process handles. Do not switch lifecycle modes as an implicit recovery step. [Official headless lifecycle](https://code.claude.com/docs/en/headless).
+Native `claude --bg` sessions (`claude agents`, `attach`, `logs`, `stop`) are a separate lifecycle; `-p` rejects `--bg`, and switching lifecycles is not a recovery step.

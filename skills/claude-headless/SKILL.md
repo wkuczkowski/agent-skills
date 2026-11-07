@@ -5,20 +5,11 @@ description: Use when you need an Anthropic model and are working outside the Cl
 
 # Claude Code headless
 
-Use `claude -p` for bounded delegated work. The user names the model and effort in the chat; pass both explicitly on every run. Check the installed `claude --version` and relevant `--help` flags; examples were checked against 2.1.278 and the release notes through 2.1.296 (2026-10-10, `research/headless-cli-release-notes-2026-10-10.md`); the measurements behind them are in the agent-skills repo under `research/claude-codex-headless-empirical-2026-09-20.md`.
+`claude -p` runs bounded delegated work. The user names the model and effort in the chat; pass both explicitly on every run (`--model`, `--effort`), including resumes. Checked against Claude Code 2.1.316, its `--help` and the changelog on 2026-11-07 (`research/claude-headless-recheck-2026-11-07.md`); if the installed `claude --version` is newer, check `--help` for the flags used here. Dated observations from real runs, with their CLI versions, are in [observed in use](references/observed-in-use.md).
 
-## Choose reasoning effort
-
-Use `medium` for most tasks, including design/UI changes, styling, routine implementation, focused fixes, research, and ordinary reviews. Reserve `high` for the hardest tasks: difficult architectural trade-offs, elusive concurrency bugs, or changes with complex interacting constraints that require deep reasoning. Task length or file count alone does not justify high.
-
-Choose between medium and high for each task or follow-up based on its actual complexity. A routine design correction after a high-effort architecture task should use medium. Honor an explicit user choice.
-
-## Choose the workflow
-
-- **One-shot consultation or extraction:** JSON output, no session persistence. Provide the needed context and a concrete deliverable.
-- **Implementation or follow-up review:** persisted session, stream JSON, one owner responsible for launch, monitoring, and resumption. Read [delegation and review](references/delegation-and-review.md) and [sessions and monitoring](references/sessions-and-monitoring.md) before launching.
-- **MCP or structured output:** read [MCP and structured output](references/mcp-and-structured-output.md).
-- **CLI failure, stalled output, uncertain process state, or exhausted quota:** read [problem reporting](references/problem-reporting.md) before retrying.
+- Implementation, follow-up review, or anything that may run subagents: persisted session and stream JSON; read [sessions and monitoring](references/sessions-and-monitoring.md) before launching.
+- MCP or schema-validated output: [MCP and structured output](references/mcp-and-structured-output.md).
+- CLI failure, exhausted quota, or uncertain process state: [problem reporting](references/problem-reporting.md) before retrying.
 
 A one-shot request:
 
@@ -30,42 +21,33 @@ timeout -s INT -k 30 3600 claude -p \
   --output-format json < prompt.txt >out.json 2>err.log
 ```
 
-Run from the intended repository using the calling tool's working-directory parameter. Store prompts and logs in a private per-run directory. Pass the prompt as a file on stdin rather than interpolating it into shell code. Piped stdin is appended to any prompt argument and has a 10 MB limit; pass paths for larger inputs. Web search works in this mode without extra configuration.
+Pass the prompt as a file on stdin rather than interpolating it into shell code. Piped stdin is appended to any prompt argument and capped at 10 MB (larger input exits non-zero); pass paths for larger inputs.
 
-## Time
+## Time and signals
 
-A killed run loses its in-flight tool calls, so arrange for the run to end on its own.
+A killed run loses its in-flight tool calls, so the run should end on its own: a deadline belongs in the prompt, and the `timeout` is only a guard against a hung process, set at several times the expected duration (3600 s is a sound default).
 
-- The `timeout` is a guard against a hung process, not a schedule. Measured on Opus at low effort: web lookup under 1 minute, bounded repository research 2–5 minutes, a task with subagents 10 minutes and more; higher effort takes longer. Set the ceiling at several times the expected duration; 3600 s is a sound default. Run anything beyond a few minutes in the background.
-- Send SIGINT, not the default SIGTERM (`timeout -s INT -k 30`). SIGINT ends the turn and writes a `result` with `subtype: error_during_execution` and `terminal_reason: aborted_streaming`; SIGTERM exits 143 and records nothing.
-- When a deadline exists, put it in the prompt rather than in the `timeout`. This wording made the agent finish early with a normal result and a list of gaps:
+Send SIGINT, not the default SIGTERM (`timeout -s INT -k 30`). SIGINT ends the turn and writes a `result` with `subtype: error_during_execution` and `terminal_reason: aborted_streaming`; SIGTERM exits 143 and records no result for the turn in progress.
 
-  > Time budget: 10 minutes of wall-clock time from your first action. Run `date +%s` first and again after every few tool calls. When 8 minutes have passed, stop exploring and deliver the report with what you have, listing the areas you did not reach under a heading "Not covered".
+Judge a hang by silence in the events file, not by elapsed time: healthy streams paused up to about 90 s (2.1.278), and ten minutes without growth is a hang. A persisted run that dies keeps the task text, every completed tool result and the subagents' saved transcripts, so resume it.
 
-  The agent errs early (a 4-minute budget ended after 2 minutes), so state the budget you can really afford.
-- For work expected to pass ten minutes, ask for a progress file: findings appended to an absolute path after each area, and the final report in a second file.
-- Judge a hang by silence, not by elapsed time. A healthy stream pauses up to about 90 seconds. Ten minutes without growth in the events file is a hang: interrupt it and resume.
-- If a persisted run dies anyway, resume it ([sessions and monitoring](references/sessions-and-monitoring.md)). The task text, every completed tool result, and the subagents' saved transcripts survive, even when the kill came seconds after launch.
+## Run status and task acceptance are separate
 
-## Report run status and task acceptance separately
+1. **Run completed:** keep the real process exit code and parse the terminal `result`, the last `result` line after the process has exited. An earlier `result` with `subtype: success` can say subagents are still running; the main turn ended and the process was waiting on them. Require exit `0`, `is_error: false`, `subtype: success` and `terminal_reason: completed`; missing fields or no terminal record mean completion is unconfirmed. Check `permission_denials` for work left undone. The terminal record does not cover background work: on 2.1.316 a background subagent stopped at the print-mode ceiling still left exit 0 and a clean result, visible only in stderr (`Background tasks still running`) and in `subagent_stats` (`completed` below `spawned`, or `killed.*` above zero). Launch any run that may spawn subagents with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`; if work was stopped, report the run as interrupted and resume it.
+2. **Task accepted:** inspect the deliverable and check the required behaviour against the files actually changed. A clean result is not a code review.
 
-1. **Run completed:** retain the actual process exit code and parse the terminal `result` object, which is the last `result` line after the process has exited. A stream can hold an earlier `result` with `subtype: success` whose text says subagents are still running; the main turn ended and the process is waiting on them, so that line is not completion. Require exit `0`, `is_error: false`, `subtype: success`, and `terminal_reason: completed`. Missing fields or a missing terminal record mean completion is unconfirmed. Inspect `permission_denials` for work left undone. A wrapper's successful exit or one successful tool call is not the agent's exit. The terminal record does not cover background work: on 2.1.274 print mode killed background subagents 600 s after the main agent ended its turn and still reported success. The 2.1.296 docs say background subagents keep the run open and the cap only ends idle waiting; that is untested here. Launch any run that may spawn subagents with `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`, and grep stderr for `Background tasks still running`; a hit means killed subagents, so report the run as interrupted and resume it ([sessions and monitoring](references/sessions-and-monitoring.md)).
-2. **Task accepted:** inspect the deliverable and verify the required behavior against the actual changed files. A clean Claude result is not a code review or proof of user-facing correctness.
+A failed or interrupted run can leave acceptable work: report the run as failed or interrupted, accept the artifact only after independent checks, and settle whether the old writer is still alive before anyone else edits the same files.
 
-A failed or interrupted run can leave useful, acceptable work. Report that run as failed/interrupted and accept its saved artifact only after independent verification. Resolve writer liveness before another agent edits the same files.
+Final text is `.result`, schema output `.structured_output`. `.session_id` is the conversation ID, not the calling tool's process handle. `.modelUsage` can list a Haiku model next to the task model when auto mode's classifier ran; that alone is not a model switch, but check the task model against the user's choice.
 
-Read final text from `.result`, structured data from `.structured_output` when requested. `.session_id` is the conversation ID, not the calling tool's process/session handle. `.modelUsage` may contain the task model and Haiku for Auto classification; that alone is not a model switch. Check the task model against the user's selection.
-
-CLI startup errors may produce no JSON. In-run errors can still produce a result, even one with `subtype: success`. Keep stdout and stderr separate, and do not pipe away the process exit status before checking it.
+Keep stdout and stderr separate and do not pipe away the exit status. A startup failure prints the error and exits 1 with no JSON (before 2.1.314 it could exit 0 with no output); a failure inside the run, such as missing authentication, is printed as the result.
 
 ## Permissions and authentication
 
-Keep `--permission-mode auto --permission-prompts none`. Inherit existing sandbox settings; do not alter global or project configuration merely to get a run through. For read-only work, state that scope and restrict available tools when useful while retaining Auto.
+Keep `--permission-mode auto --permission-prompts none` and never switch to permission bypass (`--dangerously-skip-permissions`, `bypassPermissions`); these are the user's safety decisions. With `--permission-prompts none` anything that would prompt is denied, Claude is told not to retry it, and `AskUserQuestion` is removed. Since 2.1.302 a `-p` run with no permission mode set can start in Manual mode, where calls needing approval are denied, so pass the mode on every run. Inherit existing sandbox settings and do not change global or project configuration to get a run through; resolve a denied action within existing controls. For read-only work, say so in the prompt and narrow `--tools` if useful, keeping Auto.
 
-Use `--strict-mcp-config` when no MCP server is needed. It excludes account and repository MCP configuration, not hooks, plugins, or all other customization. `--tools` selects available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary. Resolve blocked actions within existing controls; do not switch to permission bypass.
+`--strict-mcp-config` excludes account and repository MCP servers, not hooks, plugins or other customization. `--tools` selects the available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary (in auto mode a bare `Bash` entry is dropped and each command is still classified).
 
-A directory never opened interactively, typically a fresh git worktree, is untrusted: stderr says `Ignoring N permissions.allow entries from .claude/settings.json: this workspace has not been trusted`, and the project allowlist is dropped (Auto still passes the calls, hooks still run). Open the directory interactively once, or set `projects[<path>].hasTrustDialogAccepted` in `~/.claude.json`.
+`-p` skips the workspace trust dialog. In a directory never opened interactively, typically a fresh git worktree, stderr says `Ignoring N permissions.allow entries from .claude/settings.json: this workspace has not been trusted` and the project allowlist is dropped, while the project's hooks and `.mcp.json` servers still run. The fix the CLI names (open the directory interactively once, or `projects[<path>].hasTrustDialogAccepted` in `~/.claude.json`) is a configuration change for the user to make.
 
-Use the data access already authorized by the user. Ask only when a new boundary actually needs approval, not again for the same approved scope. Keep credentials out of prompts, result excerpts, and reports. Account privacy/retention terms depend on the service and settings; verify them when relevant rather than assuming all Claude launches use one account type.
-
-For authentication problems, use `claude auth status`; for CLI health, `claude doctor`. Normal print mode supports Claude.ai login. `--bare` skips OAuth/keychain authentication and is not a drop-in optimization for a subscription session. Native installations may update independently; do not update the CLI during a task unless needed and authorized.
+Credentials stay out of prompts, result excerpts and reports. Normal `-p` uses the Claude.ai login (`claude auth status`; `claude doctor` for CLI health). `--bare` never reads OAuth or the keychain, so it is not a speed-up for a subscription session. The native install updates itself; do not update the CLI during a task unless the user asks.

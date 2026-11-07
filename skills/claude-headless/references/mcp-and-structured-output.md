@@ -1,33 +1,15 @@
 # MCP and structured output
 
-Read the relevant section only when the task needs MCP or schema-validated output.
+Checked against Claude Code 2.1.316 and https://code.claude.com/docs/en/headless on 2026-11-07.
 
 ## MCP
 
-Pass only the required configuration:
+Load only the servers the task needs: `--strict-mcp-config --mcp-config /absolute/path/mcp.json`, with absolute command and argument paths in stdio definitions. Without `--strict-mcp-config`, a `-p` run loads account connectors and the repository's `.mcp.json`, and starts a project server's local command without any trust dialog or per-server approval, even in a folder never trusted.
 
-```bash
-claude -p "<task using MCP>" \
-  --model <model> --effort <effort> \
-  --permission-mode auto --permission-prompts none \
-  --strict-mcp-config --mcp-config /absolute/path/mcp.json \
-  --output-format json
-```
-
-- MCP tool names use `mcp__<server>__<tool>`.
-- `mcp__<server>__*` matches tools on one server. Adding it to `--allowedTools` pre-approves those calls; do so only when that pre-approval is intended, not just to load the server.
-- Prefer absolute command and argument paths in stdio server definitions.
-- Without `--strict-mcp-config`, Claude loads account connectors and repository MCP configuration. A project `.mcp.json` can start a local command in print mode without an interactive trust dialog.
+- Tool names are `mcp__<server>__<tool>`; `mcp__<server>__*` matches one server. Putting that in `--allowedTools` pre-approves the calls, so add it only when pre-approval is intended, not to load the server.
+- Entries that fail validation are skipped and the run still exits cleanly. With stderr redirected there is no warning; the skipped entries are only in `system/init.mcp_server_errors` (stream-json), and loaded servers with their status in `mcp_servers`.
+- A `-p` run does not wait for MCP work in the background: a call that was moved to the background loses its result.
 
 ## Structured output
 
-```bash
-claude -p "Extract function names from auth.py" \
-  --model <model> --effort <effort> \
-  --permission-mode auto --permission-prompts none \
-  --strict-mcp-config --no-session-persistence --output-format json \
-  --json-schema '{"type":"object","properties":{"functions":{"type":"array","items":{"type":"string"}}},"required":["functions"]}' \
-  >structured.json 2>err.log
-```
-
-Check the actual exit and terminal fields using the run-status checks in SKILL.md before extracting `jq '.structured_output' structured.json. Read validated data from `.structured_output`. `.result` may contain a textual rendering of the same value, but it is not the structured-output field.
+`--output-format json --json-schema '<schema>'` puts the validated value in `.structured_output`. When the run ends without valid output, for example because Claude declined, the field is absent, so check for it after the run-status checks in SKILL.md. `.result` may carry a textual rendering of the same value; it is not the validated field. An invalid schema stops the CLI before the run with `Error: --json-schema is not a valid JSON Schema`. `format` keywords are accepted but not enforced.

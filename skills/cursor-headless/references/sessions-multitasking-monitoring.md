@@ -1,33 +1,26 @@
-# Sessions, multitasking, and monitoring
+# Sessions, subagents, parallel runs, monitoring
 
-Read this file when a Cursor task needs follow-up turns, subagents, background monitoring, many independent runs, or is driven from a Claude Code orchestrator.
+Read when a Cursor task needs follow-up turns, subagents, many runs, monitoring, or is driven from a Claude Code orchestrator. Measured on 2026.09.18 unless dated otherwise; 2026.10.22 changelog items are marked.
 
 ## Sessions
 
-Every run in SKILL.md already starts from `sid=$(cursor-agent create-chat)`. A follow-up turn is the same command with a new prompt file:
+A follow-up turn is the SKILL.md command with the same `--resume "$sid"` and a new prompt file and stream.
 
-```bash
-cursor-agent -p --trust --auto-review --sandbox disabled \
-  --model grok-4.7-high --resume "$sid" \
-  --output-format stream-json < followup.txt >events-2.jsonl 2>err-2.log
-```
-
-- A resumed run keeps the session id, and the results of every completed tool call, MCP ones included, stay in context. Tool calls and subagents that were in flight when a run was killed return as "interrupted" with no content.
-- Resume by id. `--continue` takes the most recent session on the machine, which under parallel runs is someone else's.
-- `--output-format json` prints nothing until the run ends, so a killed run leaves no output at all. Use `stream-json`.
+- A resumed run keeps the session and every completed tool result, MCP ones included; since 2026.10.17 completed tool calls do not rerun on resume. Tool calls and subagents in flight when the run was killed come back as "interrupted" with no content.
+- Resume by id. `--continue` takes the most recent session on the machine, which under parallel runs is another run's.
 
 ## Subagents
 
-Grok delegates to Task subagents on its own when a task is broad; `/multitask` at the start of the prompt only makes it more likely. Subagents stay in-process and do not start another `cursor-agent`.
+Grok delegates to in-process Task subagents on its own when a task is broad.
 
-- To keep the work in the parent, end the prompt with: "Do the work yourself; do not delegate to Task subagents." The agent complied in every measured run.
+- To keep the work in the parent, end the prompt with "Do the work yourself; do not delegate to Task subagents." It complied in every measured run.
 - When delegating on purpose, give each subagent a self-contained task with absolute paths.
-- Subagents run on the parent's slug only with the client configuration named in SKILL.md; verify it in the stream.
-- The parent stream is silent while subagents work (measured 2.5–4 minutes each). Their own tool calls do not appear in it.
-- A `taskToolCall` `started` event carries `args.agentId`, `args.model`, `args.subagentType` and the prompt. Its `completed` event means the subagent finished; the report is in `result.success.conversationSteps`.
-- A subagent cannot be resumed or inspected afterwards: `--resume <agentId>` opens an empty session. A subagent's work survives only through the parent's `completed` event or a file it wrote.
+- Subagents run on the parent's slug only with the client configuration in SKILL.md; check `args.model` in the stream.
+- The parent stream is silent while subagents work, and their tool calls do not appear in it.
+- A `taskToolCall` `started` event carries `args.agentId`, `args.model`, `args.subagentType` and the prompt; `completed` means the subagent finished, with its report in `result.success.conversationSteps` (an object, not a JSON string). Since 2026.10.15/10.22 a failed or stopped subagent reports its id and reason to the parent.
+- `cursor-agent --resume <agentId>` opened an empty session (2026.09.18); a subagent's work survived only through the parent's `completed` event or a file it wrote. The 2026.10.15 changelog says resuming a failed subagent keeps its type and model, which likely means a resume from inside the parent session; the CLI form was not re-tested.
 
-List subagents with model and duration in ms (`running` until completed):
+List subagents with model and duration in ms:
 
 ```bash
 jq -r 'select(.type=="tool_call" and .tool_call.taskToolCall) | .tool_call.taskToolCall
@@ -37,25 +30,17 @@ jq -r 'select(.type=="tool_call" and .tool_call.taskToolCall) | .tool_call.taskT
 
 ## Parallel runs
 
-Launch mass parallel runs from an external runner: a bash or Python script that starts N independent `cursor-agent -p` processes, each with its own `create-chat` id, prompt file and stream. Three concurrent research runs on one account finished without interference. Auto Review blocks a nested `cursor-agent` launched from inside a `--auto-review` session: the child never starts, and the parent does the work itself.
-
-```bash
-sid=$(cursor-agent create-chat); echo "$sid" > "$run_dir/$name.sid"
-nohup timeout -k 15 3600 cursor-agent -p --trust --auto-review --sandbox disabled \
-  --workspace "$PWD" --model grok-4.7-high --resume "$sid" --output-format stream-json \
-  < "$run_dir/$name.prompt" > "$run_dir/$name.jsonl" 2> "$run_dir/$name.err" &
-```
+Start N independent `cursor-agent -p` processes from an external script, each with its own `create-chat` id, prompt file and stream; three concurrent runs on one account did not interfere. A nested `cursor-agent` launched from inside an `--auto-review` session is blocked by Auto Review: the child never starts.
 
 ## Monitoring
 
-- Completion is a final `result` event and exit 0.
-- A `tool_call` event with `subtype: started` and no matching completion is in flight. A `completed` one carries `startedAtMs` and `completedAtMs`.
-- Seconds since the stream last grew: `echo $(( $(date +%s) - $(stat -c %Y events.jsonl) ))`. Past 600, treat the run as hung (see Time in SKILL.md). `--stream-partial-output` adds text deltas when the caller needs them.
-- Count live runs with `pgrep -fc "cursor-agent/versions/.*index\.js -p"`. Looser patterns also match the `timeout` wrapper and the calling shell; `pgrep -c cursor-agent` returns 0 because the process name is `node`.
-- Each web search adds an `interaction_query` request and response pair; the response holds `approved` or `rejected`.
-- The stream is the full record. Cursor's own transcript under `~/.cursor/projects/<slug>/agent-transcripts/` keeps no tool results, so keep the jsonl.
+- A `tool_call` `started` with no matching `completed` is in flight; `completed` carries `startedAtMs` and `completedAtMs`.
+- Seconds since the stream last grew: `echo $(( $(date +%s) - $(stat -c %Y events.jsonl) ))`. Judge a hang by silence, not elapsed time; see [observed in use](observed-in-use.md) for the pause lengths seen.
+- Count live runs with `pgrep -fc "cursor-agent/versions/.*index\.js -p"`. The process is `node` (so `pgrep -c cursor-agent` returns 0), and looser patterns also match the `timeout` wrapper and the calling shell. The launcher still execs `node .../versions/<ver>/index.js` on 2026.10.22.
+- Each web search adds an `interaction_query` `request`/`response` pair; the response holds `approved` or `rejected`.
+- Keep the jsonl: Cursor's own transcript under `~/.cursor/projects/<slug>/agent-transcripts/` has no tool results.
 
-Inspect recent tool calls with:
+Recent tool calls:
 
 ```bash
 jq -r 'select(.type=="tool_call" and .subtype=="started") | .tool_call
@@ -65,6 +50,6 @@ jq -r 'select(.type=="tool_call" and .subtype=="started") | .tool_call
 
 ## Driven from a Claude Code orchestrator
 
-- Launch each run through a launcher script called with Bash `run_in_background`, and have the script write a completion file (for example `<name>.done`, holding the exit code) last.
-- An interactive session is re-invoked by the background-task notification. `claude -p` is not re-invoked after `end_turn`, so block the same turn on the completion files: `until [ -f "$run_dir/$name.done" ]; do sleep 5; done`. A Bash call stops at 600 s, so repeat the wait in further calls for longer runs.
-- Claude's auto-mode classifier may refuse a launch ("Create Unsafe Agents"). On this machine the user's `~/.claude/settings.json` allows commands that begin with `cursor-agent`, `timeout … cursor-agent`, `nohup cursor-agent` and `nohup timeout … cursor-agent`, so begin the command that way. If a launch is still refused, ask the user for an allow rule rather than rewording the prompt until it passes.
+- Launch each run through a script called with Bash `run_in_background` that writes a completion file (for example `<name>.done` holding the exit code) last.
+- An interactive Claude Code session is re-invoked by the background-task notification; `claude -p` is not re-invoked after `end_turn`, so block the same turn on the completion files (`until [ -f "$run_dir/$name.done" ]; do sleep 5; done`), repeating the wait across Bash calls, which stop at 600 s.
+- Claude's auto-mode classifier refused a direct launch ("Create Unsafe Agents", 2026-09-20) until the user added allow rules to `~/.claude/settings.json`. On 2026-11-07 that file allows `Bash(cursor-agent:*)` and `Bash(nohup cursor-agent *)` only; the `timeout … cursor-agent` rules from September are gone, so a command starting with `timeout` may be classified. If a launch is refused, ask the user for a rule rather than rewording the prompt until it passes.
