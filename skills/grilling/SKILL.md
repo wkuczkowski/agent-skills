@@ -4,7 +4,7 @@ description: Stress-tests a plan, decision or idea with the user, putting to him
 disable-model-invocation: true
 metadata:
   upstream: mattpocock/skills skills/productivity/grilling
-  upstream-commit: "49dd158d1076134a641b33efb035946536778336"
+  upstream-commit: "5863806dd4e15c63174bee4e7515a4256792ecfa"
   adopted: "2026-10-05"
 ---
 

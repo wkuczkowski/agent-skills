@@ -3,7 +3,7 @@ name: diagnosing-bugs
 description: Holds a diagnosis at reproducing and locating the failure before any code is changed. Use when the user says "diagnose" or "debug this", or reports something broken, throwing, failing or slow.
 metadata:
   upstream: mattpocock/skills skills/engineering/diagnosing-bugs
-  upstream-commit: "49dd158d1076134a641b33efb035946536778336"
+  upstream-commit: "5863806dd4e15c63174bee4e7515a4256792ecfa"
   adopted: "2026-09-22"
 ---
 

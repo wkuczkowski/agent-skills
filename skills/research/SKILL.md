@@ -3,7 +3,7 @@ name: research
 description: Investigates a question against high-trust primary sources and writes the findings into the repo for other agents to use. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to subagents.
 metadata:
   upstream: mattpocock/skills skills/engineering/research
-  upstream-commit: "321658273cb1d20b76026717d027d505790106d4"
+  upstream-commit: "5863806dd4e15c63174bee4e7515a4256792ecfa"
   adopted: "2026-09-20"
 ---
 
