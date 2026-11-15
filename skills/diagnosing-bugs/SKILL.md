@@ -1,6 +1,6 @@
 ---
 name: diagnosing-bugs
-description: Holds a diagnosis at reproducing and locating the failure before any code is changed. Use when the user says "diagnose" or "debug this", or reports something broken, throwing, failing or slow.
+description: Holds a diagnosis at reproducing and locating the failure before any code is changed. Use when the user says "diagnose" or "debug this", or when a first fix did not remove the symptom. Not for every report of something broken.
 metadata:
   upstream: mattpocock/skills skills/engineering/diagnosing-bugs
   upstream-commit: "5863806dd4e15c63174bee4e7515a4256792ecfa"
