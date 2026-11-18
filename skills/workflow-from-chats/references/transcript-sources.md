@@ -64,6 +64,12 @@ Apply these authorship checks:
 
 `parentUuid` is message ancestry, not the parent session ID. For subagents, use the enclosing directory, `sessionId` and `agentId`. Preserve UUID, session ID and ISO UTC timestamp, plus an internal file/line locator. Deduplicate UUIDs across copied/resumed history, then use lineage and timestamp/text comparison when needed. Compaction summaries are generated restatements, not fresh user evidence.
 
+## T3 Code on the development laptop
+
+Checked 2026-11-18 with T3 Code 0.1.10. If a native transcript is missing or an SDK prompt has ambiguous authorship, inspect the current message and provider-thread projections in `~/.t3/userdata/statev2.sqlite` with read-only access. Use message provenance to distinguish input sent by the user in T3 from server imports and agent-created messages. A record with `role=user` still needs provenance. In quoted-message wrappers, only the user's comment supplies new human evidence.
+
+Use the provider thread's `nativeThreadRef.nativeId` to link the import to the native session. Compare message IDs, times and normalized text across the known lineage before counting imported or resumed messages as separate evidence. Keep unresolved authorship marked as uncertain.
+
 ## Reading live history
 
 Stream transcripts without editing them. An incomplete final JSONL line can be an active write; skip and report it, or reread later. Report malformed records elsewhere as coverage gaps.

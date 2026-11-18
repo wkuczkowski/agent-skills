@@ -15,6 +15,6 @@ Research the question and leave findings in the repo that another agent can buil
 
 **Work from primary sources**: whoever owns the claim (official docs, source code, a spec, a first-party API, the original study, the legal text), not a write-up of it. Follow each claim back to that source and cite it.
 
-**Done means verified.** Every claim the findings rest on has been checked against its source; what could not be confirmed is marked as unconfirmed, not dropped and not asserted. On a complex topic, consider having a subagent with fresh context, other than the one that found them, check the key claims against their sources.
+**Done means verified.** Check every claim the findings rest on against its source and mark what remains unconfirmed. If a missing source could change the recommendation, name the conclusion that depends on it. Revisit that conclusion when the source becomes available. On a complex topic, consider asking a subagent who did not gather the evidence to check the key claims against their sources.
 
 **The reader is another agent, not a person.** Write for lookup and trust: dense, literal, dated, no narrative and no presentation. A small topic is one file; for a complex one consider an index file plus a file per thread, so a reader loads only the part it needs. Save where the repo already keeps such notes; with no convention, pick a sensible place and say where.
