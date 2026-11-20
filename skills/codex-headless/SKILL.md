@@ -5,7 +5,7 @@ description: Use when you need an OpenAI model and are working outside the Codex
 
 # Codex headless (`codex exec`)
 
-Checked against `codex-cli 0.166.0` on 2026-11-07 (help output, release notes 0.163.0–0.166.0, one smoke run). Evidence: `research/codex-headless-recheck-2026-11-07.md` and earlier notes in the agent-skills repo.
+Checked against `codex-cli 0.171.0` on 2026-11-20 (`exec --help`, `codex debug models`, changelog; earlier smoke runs in `research/codex-headless-recheck-2026-11-07.md`).
 
 ## Auto-review invariant
 
@@ -54,7 +54,7 @@ timeout -k 15 3600 codex exec --ephemeral --json --skip-git-repo-check \
 
 ## Model and effort
 
-The user names model and effort in the chat; otherwise `~/.codex/config.toml` holds the default (the built-in default since 0.161.0 is `gpt-6.1-sol`). Pass `-m` and `-c model_reasoning_effort=` on every invocation, resumes included. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request.
+The user names model and effort in the chat; otherwise `~/.codex/config.toml` holds the default (the built-in catalog default since `0.171.0` is `gpt-6.2-sol`). Pass `-m` and `-c model_reasoning_effort=` on every invocation, resumes included. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request.
 
 ## Sandbox
 

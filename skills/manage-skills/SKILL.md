@@ -1,6 +1,6 @@
 ---
 name: manage-skills
-description: Manages the user's skill collection in the agent-skills repo. Lists which skills Claude Code or Codex sees, adds vendor skills, writes new own skills, adopts a vendor skill, retires skills, edits the manifest, and runs the weekly or monthly review. Use when the user asks what skills a harness sees, wants to add, adopt, retire or review skills, or wants the manifest changed.
+description: Manages the user's skill collection in the agent-skills repo. Lists which skills Claude Code, Codex or Antigravity sees, adds vendor skills, writes new own skills, adopts a vendor skill, retires skills, edits the manifest, and runs the weekly or monthly review. Use when the user asks what skills a harness sees, wants to add, adopt, retire or review skills, or wants the manifest changed.
 ---
 
 # Manage skills
@@ -9,7 +9,7 @@ The collection lives in `~/projects/TOOLS/skills` (below: the repo), and every `
 
 ## Facts about the repo
 
-- `manifest.yaml` says what exists and which harness sees it. `bin/link` projects it onto `~/.claude/skills` and `~/.agents/skills`, plus any machine harness that machine's `machine.yaml` defines, and `bin/link check` reports drift; a clean check reports 0 findings, and `~/.claude/skills/synced` (the desktop app's account skills) is exempt. Both run after any change to the manifest, `skills/`, `private/` or `.agents/skills/`.
+- `manifest.yaml` says what exists and which harness sees it. `bin/link` projects it onto `~/.claude/skills`, `~/.agents/skills`, `~/.gemini/config/skills`, plus any machine harness that machine's `machine.yaml` defines, keeps Antigravity's global `AGENTS.md` symlinks in place (`~/.gemini/config/AGENTS.md` and T3 Code ACP's `config/AGENTS.md`), and `bin/link check` reports drift; a clean check reports 0 findings, and `~/.claude/skills/synced` (the desktop app's account skills) is exempt. Both run after any change to the manifest, `skills/`, `private/` or `.agents/skills/`.
 - Two machines share the collection; `machine.yaml` (in no repo) holds one machine's exclusions and machine-only harnesses, and `AGENTS.md` ("Two repos, two machines") describes the split. On the client-data machine Codex azure-eu, the setup allowed to touch client data, is no longer projected from here (2026-11-14): its skills are frozen copies in the user's own account, changed through `codex-admin` there or a proposal the user installs (`~/projects/TOOLS/machine-config/docs/azure-eu-admin.md`). `codex-azure-eu` in a manifest entry records what that profile was given; Claude cannot run it, and its transcripts are off limits.
 - `bin/link list <harness>` prints what a harness sees. A Codex session started inside the repo also sees every vendor skill through the project `.agents/skills` root, whatever the manifest says.
 - `bin/usage` counts invocations from transcripts (`--write` updates `usage.yaml`, `--unused` lists retirement candidates), and `bin/upstream` reports upstream changes per skill (`--diff <name>` shows one).

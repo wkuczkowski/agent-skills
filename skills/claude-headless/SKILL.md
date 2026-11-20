@@ -5,7 +5,7 @@ description: Use when you need an Anthropic model and are working outside the Cl
 
 # Claude Code headless
 
-`claude -p` runs bounded delegated work. The user names the model and effort in the chat; pass both explicitly on every run (`--model`, `--effort`), including resumes. Checked against Claude Code 2.1.316, its `--help` and the changelog on 2026-11-07 (`research/claude-headless-recheck-2026-11-07.md`); if the installed `claude --version` is newer, check `--help` for the flags used here. Dated observations from real runs, with their CLI versions, are in [observed in use](references/observed-in-use.md).
+`claude -p` runs bounded delegated work. The user names the model and effort in the chat; pass both explicitly on every run (`--model`, `--effort`), including resumes. Checked against Claude Code `2.1.329` (`--help` and changelog) on 2026-11-20 (earlier smoke runs in `research/claude-headless-recheck-2026-11-07.md`); if the installed `claude --version` is newer, check `--help` for the flags used here. Dated observations from real runs, with their CLI versions, are in [observed in use](references/observed-in-use.md).
 
 - Implementation, follow-up review, or anything that may run subagents: persisted session and stream JSON; read [sessions and monitoring](references/sessions-and-monitoring.md) before launching.
 - MCP or schema-validated output: [MCP and structured output](references/mcp-and-structured-output.md).
@@ -46,7 +46,7 @@ Keep stdout and stderr separate and do not pipe away the exit status. A startup 
 
 Keep `--permission-mode auto --permission-prompts none` and never switch to permission bypass (`--dangerously-skip-permissions`, `bypassPermissions`); these are the user's safety decisions. With `--permission-prompts none` anything that would prompt is denied, Claude is told not to retry it, and `AskUserQuestion` is removed. Since 2.1.302 a `-p` run with no permission mode set can start in Manual mode, where calls needing approval are denied, so pass the mode on every run. Inherit existing sandbox settings and do not change global or project configuration to get a run through; resolve a denied action within existing controls. For read-only work, say so in the prompt and narrow `--tools` if useful, keeping Auto.
 
-`--strict-mcp-config` excludes account and repository MCP servers, not hooks, plugins or other customization. `--tools` selects the available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary (in auto mode a bare `Bash` entry is dropped and each command is still classified).
+`--strict-mcp-config` excludes account and repository MCP servers, not hooks, plugins or other customization. Since `2.1.329` (2026-11-19), Code Mode follows normal `PreToolUse` failure behavior (a policy hook that must fail closed needs `onFailure: "block"`). `--tools` selects the available tools; `--allowedTools` pre-approves matching calls and is not an isolation boundary (in auto mode a bare `Bash` entry is dropped and each command is still classified).
 
 `-p` skips the workspace trust dialog. In a directory never opened interactively, typically a fresh git worktree, stderr says `Ignoring N permissions.allow entries from .claude/settings.json: this workspace has not been trusted` and the project allowlist is dropped, while the project's hooks and `.mcp.json` servers still run. The fix the CLI names (open the directory interactively once, or `projects[<path>].hasTrustDialogAccepted` in `~/.claude.json`) is a configuration change for the user to make.
 

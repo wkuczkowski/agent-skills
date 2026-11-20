@@ -1,0 +1,4 @@
+interface:
+  display_name: "Council"
+  short_description: "Cross-model critic or full 3-model council review"
+  default_prompt: "Use $council to run a cross-model review of this plan or diff."

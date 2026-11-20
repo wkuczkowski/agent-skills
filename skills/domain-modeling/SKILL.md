@@ -1,6 +1,6 @@
 ---
 name: domain-modeling
-description: Records what the user means by his project terms in GLOSSARY.md, and hard-to-reverse decisions as ADRs. Use when the user explains or corrects what he means by a word, uses a project term differently from the glossary or code, or when writing or editing a GLOSSARY.md or an ADR.
+description: Records what the user means by project terms in GLOSSARY.md and hard-to-reverse decisions as ADRs. Use whenever creating or updating a project's GLOSSARY.md or docs/adr/, when the user explains or corrects what he means by a word, when a project introduces or renames a domain concept, or when a major architectural/product decision settles. Not for ordinary bug fixes or UI copy.
 metadata:
   upstream: mattpocock/skills skills/engineering/domain-modeling
   upstream-commit: "d80fa0f4ebe0c5714af0adf8670336065233ecc6"
@@ -21,8 +21,9 @@ The glossary is worth having because it records what the user means by his words
 ## Writing
 
 - Terms are written as soon as they settle, not batched, and each change is mentioned in a line of the reply so he can correct it. The entry uses his term as the headword, with an English gloss when the term is Polish.
+- When editing a glossary, prune or update terms that were renamed, retired or replaced, so dead definitions do not mislead later sessions.
 - The glossary holds meanings only, never implementation details, specs or plans. Format: [references/glossary-format.md](references/glossary-format.md).
 - An ADR records a decision that is hard to reverse, surprising to a later reader without context, and the result of a real trade-off; without all three it is not worth one. Format: [references/adr-format.md](references/adr-format.md).
-- `GLOSSARY.md` sits at the repo root and ADRs in `docs/adr/`, both created when the first entry exists; a `GLOSSARY-MAP.md` at the root means one glossary per context.
+- Default locations are `GLOSSARY.md` at the repo root and `docs/adr/`, both created lazily when the first entry exists (a `GLOSSARY-MAP.md` at the root means one glossary per context). If a project already keeps them elsewhere (for example under `docs/` or `Docs/`), follow the repo's existing path.
 
 The user's instructions take precedence over this skill.

@@ -5,7 +5,7 @@ description: Use when you need the Grok model available through Cursor and are w
 
 # Cursor headless (`cursor-agent -p`)
 
-Facts below were checked on 2026-11-07 against `cursor-agent 2026.10.22-27dcf5f` (`--help`, the installed bundle, the CLI changelog) unless dated otherwise. What was seen in real runs, with dates and versions, is in [observed in use](references/observed-in-use.md); evidence in the agent-skills repo under `research/cursor-headless-*.md`.
+Facts below were checked on 2026-11-20 against `cursor-agent 2026.11.11-043ef28` (`--help`, `models`, `~/.cursor/cli-config.json`; earlier empirical checks on `2026.10.22-27dcf5f` in `research/cursor-headless-*.md`) unless dated otherwise. What was seen in real runs, with dates and versions, is in [observed in use](references/observed-in-use.md).
 
 ## One-shot run
 
@@ -43,7 +43,7 @@ Read when needed: [sessions, subagents, parallel runs, monitoring, Claude Code o
 
 ## Model
 
-`grok-4.7-high` (normal) and `grok-4.7-high-fast` (Fast, quicker output): same model and effort, chosen by the user on 2026-10-10. Fast when someone is waiting on the answer or for a smoke check; normal for background and batch work. The user's choice of mode for a run takes precedence. `cursor-agent models` lists the slugs the account has; both were listed on 2026-11-07.
+`grok-4.7-high` (normal) and `grok-4.7-high-fast` (Fast, quicker output): same model and effort, chosen by the user on 2026-10-10. Fast when someone is waiting on the answer or for a smoke check; normal for background and batch work. The user's choice of mode for a run takes precedence. `cursor-agent models` lists the slugs the account has; both were listed on 2026-11-20.
 
 ## Client configuration no flag controls
 
