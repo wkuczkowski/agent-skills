@@ -5,7 +5,7 @@ description: Use when you need an OpenAI model and are working outside the Codex
 
 # Codex headless (`codex exec`)
 
-Checked against `codex-cli 0.171.0` on 2026-11-20 (`exec --help`, `codex debug models`, changelog; earlier smoke runs in `research/codex-headless-recheck-2026-11-07.md`).
+Checked against `codex-cli 0.172.0` on 2026-11-26 (`exec --help`, `exec resume --help`, `codex debug models`, live resume check, `rust-v0.172.0` release notes; earlier smoke runs in `research/codex-headless-recheck-2026-11-07.md`).
 
 ## Auto-review invariant
 
@@ -54,7 +54,7 @@ timeout -k 15 3600 codex exec --ephemeral --json --skip-git-repo-check \
 
 ## Model and effort
 
-The user names model and effort in the chat; otherwise `~/.codex/config.toml` holds the default (the built-in catalog default since `0.171.0` is `gpt-6.2-sol`). Pass `-m` and `-c model_reasoning_effort=` on every invocation, resumes included. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request.
+The user names model and effort in the chat; otherwise `~/.codex/config.toml` holds the default (in `0.172.0` the built-in catalog lists `gpt-6.2-sol` first alongside `gpt-6.2-astra`, both supporting `model_reasoning_effort` levels `low`, `medium`, `high`, `xhigh`, `max`, and `ultra`; checked 2026-11-26). Pass `-m` and `-c model_reasoning_effort=` on every invocation, resumes included. `codex debug models | jq -r '.models[].slug'` lists what the installed CLI offers; a model the account cannot use fails at the first request.
 
 ## Sandbox
 

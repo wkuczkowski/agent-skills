@@ -12,7 +12,7 @@ codex exec resume -m <model> -c model_reasoning_effort=<effort> \
 ```
 
 - The id is the `thread_id` of the first stdout event, `thread.started`; it is there even in a run killed seconds after launch. The task text and every completed command's output survive the kill.
-- `resume` accepts neither `--sandbox` nor `-C` (help, 0.166.0) and takes the working directory from where it is run, so it is run from the original directory. On 0.155.1 a session started `read-only` resumed as the `config.toml` default, `workspace-write`; passing `-c sandbox_mode=` fixed it. Release notes 0.163.0 and 0.166.0 say resume now restores the thread's permissions while respecting explicit overrides; not tested for `exec resume`. The rollout's `turn_context` records (SKILL.md, Output and completion) show what a resumed turn actually ran with.
+- `resume` still accepts neither `--sandbox` nor `-C` (help, `0.172.0`), but since `0.172.0` (`#62194`, verified live 2026-11-26) it restores the saved thread's original working directory, workspace roots, and sandbox permissions rather than taking the caller's current directory or falling back to `config.toml`, while respecting explicit `-c` overrides (such as `-c sandbox_mode=` or `-c model_reasoning_effort=`). Passing `-c sandbox_mode=` explicitly remains safe when you want to pin or change the mode. The rollout's `turn_context` records (SKILL.md, Output and completion) show what a resumed turn actually ran with.
 - `--last` picks the newest session in the current directory (`--all` disables that filter); under parallel runs that can be someone else's, so resume by id.
 
 ## Watching a background run
