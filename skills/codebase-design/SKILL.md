@@ -21,6 +21,7 @@ Preferences for shaping code architecture and module boundaries when building so
 - **Seams only where change actually happens.** One adapter means a hypothetical seam; two mean a real one. A module may keep internal seams its own tests use without exposing them at its interface.
 - **Tests that cross the same interface the callers do.** Wanting to test past the interface is usually a sign the module is the wrong shape, and tests written against internals have to be rewritten on every refactor.
 - **Willingness to replace rather than patch.** Rewrites are cheap when agents write the code; if a cleaner boundary or fresh approach beats layering another workaround onto an awkward design, propose it openly.
+- **Revise in place — no rollback shims.** The user ships forward and never rolls back (2026-11-28): update schemas, wire formats and interfaces in place, and delete obsolete decoders, compatibility shims and version-pinned tests with the code they belonged to. Irreplaceable stored data is the exception and still gets a backup or a tested migration.
 
 ## Designing it twice
 
