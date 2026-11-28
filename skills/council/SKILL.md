@@ -32,12 +32,22 @@ If the user names specific models or efforts, use those. If a requested provider
 2. **Dispatch in parallel.** In T3 Code, call `orchestrator_capabilities` once and launch read-only delegates via `delegate_task` in parallel. Outside T3 Code, use the `claude-headless`, `codex-headless`, or `antigravity-headless` skills.
 3. **Keep delegates read-only and context-bounded.** Give each delegate the goal, relevant files or diff, and what to challenge. Do not edit files while any delegate is still reviewing the same checkout.
 4. **Act as results arrive.** Verify each delegate's findings against the code as soon as it returns, rather than waiting idle, holding actual file edits until the round finishes.
-5. **Score reviews.** For code, plan, or artifact reviews, ask each delegate for a score out of 10 and concrete findings. Record `no score` if a delegate omits it; never invent one.
+5. **Score reviews.** For code, plan, or artifact reviews, ask each delegate for a score out of 10 and concrete findings, each marked `blocker` or `nit` with its evidence. Record `no score` if a delegate omits it; never invent one.
 
-## Iterating and reporting
+## Round budget
+
+Set by the user on 2026-11-28, after reviews in one project ran to nine rounds (2026-11-21..27) and fix chains in another took about 14 of 24 hours. The rules come from tstack `sol-loop` (budget) and pstack `interrogate` (evidence).
 
 - Each full pass is one round; a fresh review after fixes is a new round.
-- Fix findings you agree with and re-run only when real issues remain. Fight scope creep across rounds.
+- **Three rounds by default.** Round 1 is full. Later rounds get the open findings, what was fixed or declined and why, and the change since the last round, and look at nothing else.
+- **Up to five** only for security, permissions, data loss or state and concurrency, while a blocker stays open with evidence, or when the user asks for more.
+- **A blocker needs evidence**: the intended case going wrong, shown by file and line, command output or a failing test; for a plan or analysis, the passage or source it contradicts. A finding without that is a nit, whatever label the delegate gave it. Check each finding and its severity against the code yourself.
+- **Rounds end when no blocker is open.** Scores are information, not the goal: a round is never run to raise one. A round that returns only nits is the last, and declined nits or comment, doc and format-only fixes need no new round.
+- Fix what you agree with using the smallest change; decline nits and out-of-scope findings in one line and list them as follow-ups. Do not agree just to end the loop.
+- **Budget spent with a blocker still disputed is not approval.** Give the user both sides in two or three sentences each, with your recommendation; he decides.
+
+## Reporting
+
 - Summarize useful findings, disagreements between models, and recommended next steps concisely in the user's language. Include a compact round table when scores were collected:
 
 ```markdown

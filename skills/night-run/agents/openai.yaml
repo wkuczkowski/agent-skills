@@ -1,0 +1,4 @@
+interface:
+  display_name: "Night run"
+  short_description: "Unattended run until a set hour, then a report"
+  default_prompt: "Use $night-run: tryb noc do 7:00 for the task I describe."
